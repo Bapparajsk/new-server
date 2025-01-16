@@ -37,7 +37,7 @@ const authenticateAndRedirect = (strategy: string) => {
                 if (err) {
                     return res.redirect("http://localhost:3000/register");
                 }
-
+                // todo create a token and send it to the user
                 return res.redirect("http://localhost:3000");
             });
         })(req, res, next);

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, register, verifyOtp } from "../controller/auth";
+import { login, register, verifyOtp, loginWithOtp, sendOtp } from "../controller/auth";
 import verifyUser from "../middleware/verifyUser";
 import {passport, authenticateAndRedirect} from '../config';
 
@@ -10,6 +10,7 @@ authRouter.post('/login', login);  // Path: /api/auth/login
 authRouter.post('/register', register);  // Path: /api/auth/register
 
 // * Path: /api/auth/otp
+authRouter.post('/otp/login-with', loginWithOtp);  // Path: /api/auth/otp
 authRouter.post('/otp/verify', verifyUser, verifyOtp);  // Path: /api/auth/otp/verify
 
 // * passport authentication routes google and github

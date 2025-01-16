@@ -6,9 +6,9 @@ export const generateToken = (payload: object, expiresIn: string | number = '1h'
     return jwt.sign(payload, secret, { expiresIn });
 };
 
-export const verifyToken = (token: string): object | string => {
+export const verifyToken = (token: string): object  => {
     try {
-        return jwt.verify(token, secret);
+        return jwt.verify(token, secret) as object;
     } catch (error) {
         throw new Error('Invalid token');
     }

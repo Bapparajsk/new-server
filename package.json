@@ -18,6 +18,8 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.1",
+    "@types/express-useragent": "^1.0.5",
+    "@types/geoip-lite": "^1.4.4",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/morgan": "^1.9.9",
     "@types/nodemailer": "^6.4.17",
@@ -34,11 +36,14 @@
     "typescript-eslint": "^8.19.1"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "express-useragent": "^1.0.15",
+    "geoip-lite": "^1.4.10",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.4",
     "morgan": "^1.10.0",
@@ -46,6 +51,7 @@
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
+    "uuid": "^11.0.5",
     "zod": "^3.24.1"
   }
 }

@@ -3,6 +3,8 @@ import z from 'zod';
 import {loginZod} from "../../lib/zod";
 import UserModel from "../../models/user.model";
 import {sortUser} from "../../lib/user";
+import { generateToken } from "../../lib/jwt";
+import sendOtpEmail from "../../lib/email";
 
 const login = async (req: Request, res: Response) => {
     try {
@@ -19,6 +21,20 @@ const login = async (req: Request, res: Response) => {
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             res.status(400).json({ message: "Invalid credentials" });
+            return;
+        }
+
+        if (user.towFactorAuth === true) {
+            // create temporary token and send OTP
+            const tempToken = generateToken({ email: user.email }, '5m');
+            const otp = user.generateOTP();
+            await user.save();
+
+            // Send OTP email asynchronously
+            sendOtpEmail(email, otp).catch(console.error);
+
+            // Respond with success
+            res.status(200).json({ message: "Two Factor Authentication is enabled", tempToken });
             return;
         }
 

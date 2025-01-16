@@ -1,3 +1,4 @@
+import axios from "axios";
 import {User} from "../schema/user.schema";
 
 export const sortUser = (user: User) => {

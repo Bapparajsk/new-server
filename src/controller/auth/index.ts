@@ -1,9 +1,11 @@
 import login from './login';
 import register from "./register";
-import {verifyOtp} from "./otp";
+import {verifyOtp, sendOtp, loginWithOtp} from "./otp";
 
 export {
   login,
   register,
-  verifyOtp
+  verifyOtp,
+  sendOtp,
+  loginWithOtp,
 };

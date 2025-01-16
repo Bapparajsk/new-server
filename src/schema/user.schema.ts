@@ -31,7 +31,7 @@ export interface User extends Document {
     // Methods
     comparePassword(candidatePassword: string): Promise<boolean>;
     generateToken(expiresIn?: string): string;
-    verifyToken(token: string): object | string;
+    verifyToken(token: string): object;
     generateOTP(): string;
 }
 
@@ -69,5 +69,6 @@ export interface Notification {
 export interface LoginDevice {
     deviceId: string;
     deviceName: string;
+    os: string;
     lastLogin: Date;
 }

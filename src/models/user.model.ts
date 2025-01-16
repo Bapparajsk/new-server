@@ -38,6 +38,7 @@ const NotificationSchema = new Schema<schemas.Notification>({
 const LoginDeviceSchema = new Schema<schemas.LoginDevice>({
     deviceId: {type: String, required: true},
     deviceName: {type: String, required: true},
+    os: {type: String, required: true},
     lastLogin: {type: Date, default: Date.now}
 })
 
@@ -77,7 +78,7 @@ UserSchema.methods.generateToken = function (expiresIn: string = '1h'): string {
 };
 
 // Verify JWT token
-UserSchema.methods.verifyToken = function (token: string): object | string {
+UserSchema.methods.verifyToken = function (token: string): object {
     return verifyToken(token);
 };
 
