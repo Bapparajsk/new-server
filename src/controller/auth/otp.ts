@@ -128,6 +128,7 @@ export const loginWithOtp = async (req: Request, res: Response) => {
             deviceName: req.useragent?.source || "Unknown",
             os: req.useragent?.os || "Unknown",
             lastLogin: new Date(),
+            isPrimary: false
         };
         user.loginDevices.set(devicesId, deviceDetails);
 
