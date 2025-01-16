@@ -3,6 +3,7 @@ import rateLimiter from './rateLimiter';
 import { googleStrategyVerify, StrategyVerify } from "./passport-oauth";
 import corsMiddleware from './cors';
 import sessionMiddleware from './session';
+import * as helmetMiddleware from './helmet';
 
 export {
     verifyUser,
@@ -10,5 +11,6 @@ export {
     googleStrategyVerify,
     StrategyVerify,
     corsMiddleware,
-    sessionMiddleware
+    sessionMiddleware,
+    helmetMiddleware
 }
