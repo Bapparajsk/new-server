@@ -19,17 +19,18 @@ const register = async (req: Request, res: Response) => {
         }
 
         // Prepare login device details
-        const devicesId = uuidv4();
+        const deviceId = uuidv4();
         const deviceDetails: LoginDevice = {
-            deviceId: devicesId,
+            deviceId,
             deviceName: req.useragent?.source || "Unknown",
             os: req.useragent?.os || "Unknown",
             lastLogin: new Date(),
+            isPrimary: false,
         };
 
         // Create a new Map for loginDevices
         const loginDevices = new Map<string, LoginDevice>();
-        loginDevices.set(devicesId, deviceDetails);
+        loginDevices.set(deviceId, deviceDetails);
 
         // Create and save user
         const user = new UserModel({
@@ -39,7 +40,7 @@ const register = async (req: Request, res: Response) => {
             loginDevices,
         });
         const otp = user.generateOTP();
-        const token = user.generateToken({devicesId}, "2d");
+        const token = user.generateToken({deviceId}, "2d");
         await user.save();
 
         // Send OTP email asynchronously

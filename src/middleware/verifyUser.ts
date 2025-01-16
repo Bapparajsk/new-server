@@ -12,7 +12,7 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     try {
-        const id = verifyToken(token) as { _id: string, devicesId: string };
+        const id = verifyToken(token) as { _id: string, deviceId: string };
         if (!id) {
             res.status(401).json({ message: "Unauthorized" });
             return;
@@ -24,13 +24,14 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
             return;
         }
 
-        if (!user.loginDevices.has(id.devicesId)) {
+        if (!user.loginDevices.has(id.deviceId)) {
             console.log('device not found');
             res.status(401).json({ message: "Unauthorized" });
             return;
         }
 
         req.User = user;
+        req.deviceId = id.deviceId
         next();
     } catch (error) {
         console.error(error);

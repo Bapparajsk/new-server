@@ -42,20 +42,21 @@ const login = async (req: Request, res: Response) => {
         }
 
         // prepare login device details
-        const devicesId = uuidv4();
+        const deviceId = uuidv4();
         const deviceDetails: LoginDevice = {
-            deviceId: devicesId,
+            deviceId,
             deviceName: req.useragent?.source || "Unknown",
             os: req.useragent?.os || "Unknown",
             lastLogin: new Date(),
+            isPrimary: false,
         };
-        user.loginDevices.set(devicesId, deviceDetails);
+        user.loginDevices.set(deviceId, deviceDetails);
 
         // save user
         await user.save();
 
         // create token and set client cookie
-        const token = user.generateToken({devicesId}, '2d');
+        const token = user.generateToken({deviceId}, '2d');
         res.cookie('authToken', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
