@@ -6,7 +6,11 @@ import UserModel from "../../models/user.model";
 import {LoginDevice, User} from "../../schema/user.schema";
 import {sortUser} from "../../lib/user";
 
-const otpMach = (user: User, otp: string): [boolean, string] => {
+const otpMach = (user: User, otp: string | undefined): [boolean, string] => {
+    if (!otp) {
+        return [false, "OTP is required"];
+    }
+
     // Check if OTP exists for the user
     if (!user.otp) {
         return [false ,"OTP not found"];
@@ -22,17 +26,14 @@ const otpMach = (user: User, otp: string): [boolean, string] => {
         return [false, "Invalid OTP"];
     }
 
+    // Clear OTP and expiration date after successful verification
+    user.otp = null;
+    user.otpExpires = null;
     return [true, "OTP verified"];
 }
 
 export const verifyOtp = async (req: Request, res: Response) => {
     const { otp } = req.body;
-
-    // Check if OTP is provided
-    if (!otp) {
-        res.status(400).json({ message: "OTP is required" });
-        return;
-    }
 
     try {
         const user = req.User;
@@ -49,10 +50,9 @@ export const verifyOtp = async (req: Request, res: Response) => {
             return;
         }
 
-        // Clear OTP and expiration date after successful verification
-        user.otp = null;
-        user.otpExpires = null;
+        // save user
         await user.save();
+
         res.status(200).json({ message: "OTP verified" });
     } catch (e) {
         console.error(e);
@@ -87,12 +87,6 @@ export const sendOtp = async (req: Request, res: Response) => {
 export const loginWithOtp = async (req: Request, res: Response) => {
     const { tempToken, otp } = req.body;
 
-    // Check if OTP is provided
-    if (!otp) {
-        res.status(400).json({ message: "OTP is required" });
-        return;
-    }
-
     if (!tempToken) {
         res.status(400).json({ message: "Temporary token is required" });
         return;
@@ -117,10 +111,6 @@ export const loginWithOtp = async (req: Request, res: Response) => {
             return;
         }
 
-        // Clear OTP and expiration date after successful verification
-        user.otp = null;
-        user.otpExpires = null;
-
         // loginDevices add new device
         const devicesId = uuid4();
         const deviceDetails: LoginDevice = {
@@ -144,3 +134,49 @@ export const loginWithOtp = async (req: Request, res: Response) => {
         res.status(500).json({ message: "interval server error" });
     }
 };
+
+export const registerPrimaryDeviceVerifyOtp = async (req: Request, res: Response) => {
+    const { accessToken, otp } = req.body;
+
+    if (!accessToken) {
+        res.status(400).json({ message: "Temporary token is required" });
+        return;
+    }
+
+    try {
+        const { task, deviceId } = verifyToken(accessToken) as {task: string, deviceId : string};
+        if (!task || deviceId === undefined) {
+            res.status(400).json({ message: "Invalid token" });
+            return;
+        }
+
+        const user = req.User;
+        if (!user) {
+            res.status(404).json({ message: "Unauthorized" });
+            return;
+        }
+
+        const [verified, message] = otpMach(user, otp);
+        if (!verified) {
+            res.status(400).json({ message });
+            return;
+        }
+
+        const device = user.loginDevices.get(deviceId);
+        if (!device) {
+            res.status(404).json({ message: "Device not found" });
+            return;
+        }
+
+        // set primary device
+        device.isPrimary = true;
+
+        // save user
+        await user.save();
+
+        res.status(200).json({ message: "Primary device registered" });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: "interval server error" });
+    }
+}
