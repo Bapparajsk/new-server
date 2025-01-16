@@ -71,4 +71,5 @@ export interface LoginDevice {
     deviceName: string;
     os: string;
     lastLogin: Date;
+    isPrimary: boolean;
 }

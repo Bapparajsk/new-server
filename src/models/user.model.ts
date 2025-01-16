@@ -39,7 +39,8 @@ const LoginDeviceSchema = new Schema<schemas.LoginDevice>({
     deviceId: {type: String, required: true},
     deviceName: {type: String, required: true},
     os: {type: String, required: true},
-    lastLogin: {type: Date, default: Date.now}
+    lastLogin: {type: Date, default: Date.now},
+    isPrimary: {type: Boolean, default: false}
 })
 
 const UserSchema = new Schema<schemas.User>({
