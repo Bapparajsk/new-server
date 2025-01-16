@@ -39,7 +39,7 @@ const register = async (req: Request, res: Response) => {
             loginDevices,
         });
         const otp = user.generateOTP();
-        const token = user.generateToken();
+        const token = user.generateToken({devicesId}, "2d");
         await user.save();
 
         // Send OTP email asynchronously

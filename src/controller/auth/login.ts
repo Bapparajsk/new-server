@@ -5,6 +5,8 @@ import UserModel from "../../models/user.model";
 import {sortUser} from "../../lib/user";
 import { generateToken } from "../../lib/jwt";
 import sendOtpEmail from "../../lib/email";
+import {v4 as uuidv4} from "uuid";
+import {LoginDevice} from "../../schema/user.schema";
 
 const login = async (req: Request, res: Response) => {
     try {
@@ -24,6 +26,7 @@ const login = async (req: Request, res: Response) => {
             return;
         }
 
+        // check if user has 2FA enabled
         if (user.towFactorAuth === true) {
             // create temporary token and send OTP
             const tempToken = generateToken({ email: user.email }, '5m');
@@ -38,8 +41,28 @@ const login = async (req: Request, res: Response) => {
             return;
         }
 
-        // create token
-        const token = user.generateToken();
+        // prepare login device details
+        const devicesId = uuidv4();
+        const deviceDetails: LoginDevice = {
+            deviceId: devicesId,
+            deviceName: req.useragent?.source || "Unknown",
+            os: req.useragent?.os || "Unknown",
+            lastLogin: new Date(),
+        };
+        user.loginDevices.set(devicesId, deviceDetails);
+
+        // save user
+        await user.save();
+
+        // create token and set client cookie
+        const token = user.generateToken({devicesId}, '2d');
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 60 * 24 * 2,
+        });
+
         res.status(200).json({ token, user: sortUser(user) });
     } catch (error) {
         console.error(error);

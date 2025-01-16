@@ -73,8 +73,8 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string):
 };
 
 // Generate JWT token
-UserSchema.methods.generateToken = function (expiresIn: string = '1h'): string {
-    return generateToken({_id: this._id}, expiresIn);
+UserSchema.methods.generateToken = function (payload?: object , expiresIn: string = '1h'): string {
+    return generateToken({_id: this._id, ...payload}, expiresIn);
 };
 
 // Verify JWT token

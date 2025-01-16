@@ -4,13 +4,15 @@ import { verifyToken } from "../lib/jwt";
 
 const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.header('x-auth-token');
+    // * const token = req.cookies.authToken;  // this for production
+
     if (!token) {
         res.status(401).json({ message: "Unauthorized" });
         return;
     }
 
     try {
-        const id = verifyToken(token);
+        const id = verifyToken(token) as { _id: string, devicesId: string };
         if (!id) {
             res.status(401).json({ message: "Unauthorized" });
             return;
@@ -21,6 +23,13 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
             res.status(401).json({ message: "Unauthorized" });
             return;
         }
+
+        if (!user.loginDevices.has(id.devicesId)) {
+            console.log('device not found');
+            res.status(401).json({ message: "Unauthorized" });
+            return;
+        }
+
         req.User = user;
         next();
     } catch (error) {

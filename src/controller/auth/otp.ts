@@ -121,9 +121,6 @@ export const loginWithOtp = async (req: Request, res: Response) => {
         user.otp = null;
         user.otpExpires = null;
 
-        // create token
-        const token = user.generateToken();
-
         // loginDevices add new device
         const devicesId = uuid4();
         const deviceDetails: LoginDevice = {
@@ -133,6 +130,9 @@ export const loginWithOtp = async (req: Request, res: Response) => {
             lastLogin: new Date(),
         };
         user.loginDevices.set(devicesId, deviceDetails);
+
+        // create token
+        const token = user.generateToken({devicesId}, "2d");
 
         // save user
         await user.save();
