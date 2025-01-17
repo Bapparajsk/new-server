@@ -7,11 +7,10 @@ import { passport } from "./config";
 import {rateLimiter, corsMiddleware, sessionMiddleware, helmetMiddleware, verifyUser} from "./middleware";
 
 // * router
-import {authRouter} from "./router";
+import {authRouter,userRouter} from "./router";
 
 const app = express();
 const PORT: number = Number(process.env.PORT || "8000");
-
 const {helmet, helmetContentSecurityPolicy} = helmetMiddleware;
 
 app.use(morgan('dev'));
@@ -30,7 +29,8 @@ app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 app.use(helmet.ieNoOpen());
 
-app.use('/api/auth', authRouter);
+app.use('/api/auth', authRouter);                   // * user auth routes and passport routes
+app.use('/api/user', verifyUser , userRouter);      // * user routes
 
 // ! test route
 app.get("/", verifyUser, (req, res) => {
