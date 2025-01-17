@@ -10,7 +10,6 @@ import {rateLimiter, corsMiddleware, sessionMiddleware, helmetMiddleware, verify
 import {authRouter,userRouter} from "./router";
 
 const app = express();
-const PORT: number = Number(process.env.PORT || "8000");
 const {helmet, helmetContentSecurityPolicy} = helmetMiddleware;
 
 app.use(morgan('dev'));
@@ -33,10 +32,8 @@ app.use('/api/auth', authRouter);                   // * user auth routes and pa
 app.use('/api/user', verifyUser , userRouter);      // * user routes
 
 // ! test route
-app.get("/", verifyUser, (req, res) => {
-    res.json({ user: req.User });
+app.get("/", (req, res) => {
+    res.json({ user: req.User || "it is work" });
 })
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port http://127.0.0.1:${PORT}`);
-});
+export default app;

@@ -10,7 +10,7 @@ client.on("error", () => {
 });
 
 client.on("connect", () => {
-    console.log('Redis connection connected');
+    console.log('Redis Connected Successfully');
 })
 
 export default client;
