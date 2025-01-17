@@ -6,11 +6,11 @@ const client = new Ioredis({
 });
 
 client.on("error", () => {
-    console.log('Redis connection failed');
+    console.log('Redis connection failed ❌');
 });
 
 client.on("connect", () => {
-    console.log('Redis Connected Successfully');
+    console.log('Redis Connected Successfully 🚀');
 })
 
 export default client;
