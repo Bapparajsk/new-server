@@ -24,7 +24,7 @@ authRouter.delete("/logout", verifyUser, logout);  // Path: /api/auth/logout
 authRouter.delete("/logout/:deviceId", verifyUser, logoutDevice);  // Path: /api/auth/logout/:deviceId
 authRouter.post("/logout/devices", verifyUser, logoutDevices);  // Path: /api/auth/logout/devices
 
-// * passport authentication routes google and github
+// * passport authentication routes google and gitHub
 authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 authRouter.get('/google/callback', authenticateAndRedirect('google'));
 
