@@ -4,7 +4,7 @@ import {sortUser, userAllData} from "../../lib/user";
 import UserModel from "../../models/user.model";
 import {User} from "../../schema/user.schema";
 
-export const getUser = async (req: Request, res: Response) => {
+export const get = async (req: Request, res: Response) => {
     try {
         const user = req.User;
         if (!user) {

@@ -1,3 +1,3 @@
-import { getUser, getUserById } from "./getUser";
+import { get, getUserById } from "./get";
 
-export { getUser, getUserById };
+export { get, getUserById };
