@@ -2,7 +2,7 @@ import {model, Schema} from "mongoose";
 import bcrypt from "bcrypt";
 import * as schemas from "../schema/user.schema";
 import {generateToken, verifyToken} from "../lib/jwt";
-import { randomInt } from 'crypto';
+import { randomInt, hash } from 'crypto';
 
 const MessageSchema = new Schema<schemas.Message>({
     message: {type: String, required: true},
@@ -51,6 +51,7 @@ const UserSchema = new Schema<schemas.User>({
     otp: {type: String, default: null},
     otpExpires: {type: Date, default: null},
     profilePicture: {type: String, default: null},
+    coverPicture: {type: String, default: null},
     friends: {type: Map, of: FriendSchema, default: new Map()},
     friendRequests: {type: Map, of: FriendSchema, default: new Map()},
     friendRequestsSent: {type: Map, of: FriendSchema, default: new Map()},
@@ -67,7 +68,6 @@ const UserSchema = new Schema<schemas.User>({
 });
 
 // * Methods
-
 // Compare password with hashed password
 UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password);

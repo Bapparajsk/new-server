@@ -135,30 +135,23 @@ export const loginWithOtp = async (req: Request, res: Response) => {
     }
 };
 
-export const registerPrimaryDeviceVerifyOtp = async (req: Request, res: Response) => {
+export const primaryDeviceVerifyOtp = async (req: Request, res: Response) => {
     const { accessToken, otp } = req.body;
 
-    if (!accessToken) {
-        res.status(400).json({ message: "Temporary token is required" });
+    if (!accessToken || !otp) {
+        res.status(400).json({ message: "Temporary token and otp is required" });
         return;
     }
 
     try {
         const { task, deviceId } = verifyToken(accessToken) as {task: string, deviceId : string};
-        if (!task || deviceId === undefined) {
+        if (!["setPrimaryDevice", "removePrimaryDevice"].includes(task) || !deviceId) {
             res.status(400).json({ message: "Invalid token" });
-            return;
         }
 
         const user = req.User;
         if (!user) {
             res.status(404).json({ message: "Unauthorized" });
-            return;
-        }
-
-        const [verified, message] = otpMach(user, otp);
-        if (!verified) {
-            res.status(400).json({ message });
             return;
         }
 
@@ -168,13 +161,17 @@ export const registerPrimaryDeviceVerifyOtp = async (req: Request, res: Response
             return;
         }
 
-        // set primary device
-        device.isPrimary = true;
+        const [verified, message] = otpMach(user, otp);
+        if (!verified) {
+            res.status(400).json({ message });
+            return;
+        }
 
-        // save user
+        // set primary device or remove primary device
+        device.isPrimary = task === "setPrimaryDevice";
         await user.save();
 
-        res.status(200).json({ message: "Primary device registered" });
+        res.status(200).json({ message: "OTP verified" });
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "interval server error" });

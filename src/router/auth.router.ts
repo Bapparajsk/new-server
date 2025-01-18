@@ -3,7 +3,7 @@ import {
     login, register,
     verifyOtp, loginWithOtp, sendOtp,
     logout, logoutDevice, logoutDevices,
-    registerPrimaryDevice, registerPrimaryDeviceVerifyOtp
+    setPrimaryDevice, removePrimaryDevice, primaryDeviceVerifyOtp
 } from "../controller/auth";
 import verifyUser from "../middleware/verifyUser";
 import {passport, authenticateAndRedirect} from '../config';
@@ -31,7 +31,8 @@ authRouter.get('/google/callback', authenticateAndRedirect('google'));
 authRouter.get('/github', passport.authenticate('github', { scope: ['user:email', 'id', 'displayName', 'photos'] }));
 authRouter.get('/github/callback', authenticateAndRedirect('github'));
 
-authRouter.patch("/register-primary-device/:deviceId", verifyUser, registerPrimaryDevice);  // Path: /api/auth/register-primary-device/:deviceId
-authRouter.post("/register-primary-device/verify-otp", verifyUser, registerPrimaryDeviceVerifyOtp);  // Path: /api/auth/register-primary-device/verify-otp
+authRouter.post("/register-primary-device/:deviceId", verifyUser, setPrimaryDevice);  // Path: /api/auth/register-primary-device/:deviceId
+authRouter.delete("/remove-primary-device/:deviceId", verifyUser, removePrimaryDevice);  // Path: /api/auth/remove-primary-device/:deviceId
+authRouter.post("/register-primary-device/verify-otp", verifyUser, primaryDeviceVerifyOtp);  // Path: /api/auth/register-primary-device/verify-otp
 
 export default authRouter;

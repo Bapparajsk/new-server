@@ -10,6 +10,7 @@ export interface User extends Document {
     otp: string | null;
     otpExpires: Date | null;
     profilePicture: string | null;
+    coverPicture: string | null;
     // Friends and Notifications
     friends: Map<string, Friend>;
     friendRequests: Map<string, Friend>;

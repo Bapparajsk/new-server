@@ -1,15 +1,15 @@
 import login from './login';
 import register from "./register";
-import {verifyOtp, sendOtp, loginWithOtp, registerPrimaryDeviceVerifyOtp} from "./otp";
+import {verifyOtp, sendOtp, loginWithOtp, primaryDeviceVerifyOtp} from "./otp";
 import { logoutDevice, logoutDevices, logout } from "./logout";
-import registerPrimaryDevice from "./registerPrimaryDevice";
+import {setPrimaryDevice, removePrimaryDevice} from "./primaryDevice";
 
 export {
     login, register,
     // otp verification and sending otp functions
-    verifyOtp, sendOtp, loginWithOtp, registerPrimaryDeviceVerifyOtp,
+    verifyOtp, sendOtp, loginWithOtp, primaryDeviceVerifyOtp,
     // logout functions
     logoutDevice, logoutDevices, logout,
     // register primary device function
-    registerPrimaryDevice,
+    setPrimaryDevice, removePrimaryDevice,
 };
