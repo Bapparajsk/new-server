@@ -1,6 +1,7 @@
 import z from 'zod';
 import {User} from "../../schema/user.schema";
 import {registerZod} from "../../lib/zod";
+import {sendEmail} from "../../lib/email";
 
 const passwordZod = registerZod.pick({password: true});
 
@@ -18,6 +19,9 @@ export const updatePassword = (user: User, body: any) => {
 
         const { password } = passwordZod.parse({password: newPassword});
         user.password = password;
+        user.notifications.push({ name: "Password Updated", description: "Your password has been updated successfully", type: "password", date: new Date() });
+
+        sendEmail(user.email, "Password Updated", "Your password has been updated successfully").catch(console.error);
         return [false, "Password updated successfully"];
     } catch (e) {
         console.error(e);

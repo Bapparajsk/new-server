@@ -10,6 +10,12 @@ export const updateName = (user: User, body: any) => {
         }
 
         user.name = name;
+        user.notifications.push({
+            name: "Name updated",
+            description: "Name updated successfully",
+            type: "name",
+            date: new Date()
+        });
         return [false, "Name updated successfully"];
     } catch (e) {
         console.error(e);

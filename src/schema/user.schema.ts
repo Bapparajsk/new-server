@@ -15,7 +15,7 @@ export interface User extends Document {
     friends: Map<string, Friend>;
     friendRequests: Map<string, Friend>;
     friendRequestsSent: Map<string, Friend>;
-    notifications: Map<string, Notification>;
+    notifications: Notification[];
     // Security
     loginDevices: Map<string, LoginDevice>;
     towFactorAuth: boolean;
@@ -64,7 +64,8 @@ export interface Notification {
     description?: string | undefined;
     link?: string;
     linkName?: string;
-    type?: "post" | "friend-request" | "comment" | "like" | "share" | "friend-reject" | "message" | "notification" | undefined;
+    type?: "name" | "login" | "post" | "friend-request" | "comment" | "like" | "share" | "friend-reject" | "message" | "notification" | "password"| "email"| "primaryDevice" | undefined;
+    date: Date;
 }
 
 export interface LoginDevice {

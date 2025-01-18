@@ -55,7 +55,7 @@ const UserSchema = new Schema<schemas.User>({
     friends: {type: Map, of: FriendSchema, default: new Map()},
     friendRequests: {type: Map, of: FriendSchema, default: new Map()},
     friendRequestsSent: {type: Map, of: FriendSchema, default: new Map()},
-    notifications: {type: Map, of: NotificationSchema, default: new Map()},
+    notifications: {type: [NotificationSchema], default: []},
     loginDevices: {type: Map, of: LoginDeviceSchema, default: new Map()},
     towFactorAuth: {type: Boolean, default: false},
     chatSystem: {
