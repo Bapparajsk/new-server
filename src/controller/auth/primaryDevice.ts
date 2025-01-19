@@ -7,10 +7,10 @@ const isPrimaryExists = (list: Map<string, LoginDevice>): boolean => {
     const values = list.values();
     for (const value of values) {
         if (value.isPrimary) {
-            return false;
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 const isPrimaryDevice = (list: Map<string, LoginDevice>, deviceId: string): boolean => {

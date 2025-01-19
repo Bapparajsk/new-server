@@ -137,7 +137,6 @@ export const loginWithOtp = async (req: Request, res: Response) => {
 
 export const primaryDeviceVerifyOtp = async (req: Request, res: Response) => {
     const { accessToken, otp } = req.body;
-
     if (!accessToken || !otp) {
         res.status(400).json({ message: "Temporary token and otp is required" });
         return;

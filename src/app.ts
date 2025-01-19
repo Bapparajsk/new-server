@@ -32,7 +32,7 @@ app.use('/api/auth', authRouter);                   // * user auth routes and pa
 app.use('/api/user', verifyUser , userRouter);      // * user routes
 
 // ! test route
-app.get("/", (req, res) => {
+app.get("/", verifyUser , (req, res) => {
     res.json({ user: req.User || "it is work" });
 })
 
