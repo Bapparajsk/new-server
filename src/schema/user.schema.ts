@@ -60,11 +60,15 @@ export interface Friend {
 export interface Notification {
     name?: string;
     title?: string;
-    imageSrc?: string;
+    imageSrc?: string | null;
     description?: string | undefined;
     link?: string;
     linkName?: string;
-    type?: "name" | "login" | "post" | "friend-request" | "comment" | "like" | "share" | "friend-reject" | "message" | "notification" | "password"| "email"| "primaryDevice" | undefined;
+    type?: "name" | "message" |
+        "post" | "comment" | "like" | "share" |
+        "friend-accept" | "friend-request"  | "friend-reject" |
+        "notification" | "password"| "email"| "primaryDevice" |
+        "login" | undefined;
     date: Date;
 }
 

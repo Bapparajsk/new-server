@@ -7,7 +7,7 @@ import { passport } from "./config";
 import {rateLimiter, corsMiddleware, sessionMiddleware, helmetMiddleware, verifyUser} from "./middleware";
 
 // * router
-import {authRouter,userRouter} from "./router";
+import {authRouter,userRouter, friendRouter} from "./router";
 
 const app = express();
 const {helmet, helmetContentSecurityPolicy} = helmetMiddleware;
@@ -29,7 +29,8 @@ app.use(helmet.noSniff());
 app.use(helmet.ieNoOpen());
 
 app.use('/api/auth', authRouter);                   // * user auth routes and passport routes
-app.use('/api/user', verifyUser , userRouter);      // * user routes
+app.use('/api/user', verifyUser , userRouter);      // * user routes for user profile and user settings
+app.use('/api/friend', verifyUser , friendRouter);  // * friend routes for friend list and friend request
 
 // ! test route
 app.get("/", verifyUser , (req, res) => {

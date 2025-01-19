@@ -1,7 +1,7 @@
 import app from '../app'
 import {createServer} from "http";
 import {Server} from "socket.io";
-// import {handleConnection} from "../socketIo/Io";
+import handleConnection from "../socket";
 
 const PORT = Number(process.env.PORT || "8000");
 const httpServer = createServer(app);
@@ -15,7 +15,7 @@ const io = new Server(httpServer, {
 
 
 io.on('connection', (socket) => {
-    // handleConnection(socket);
+    handleConnection(socket);
 });
 
 httpServer.listen(PORT, () => {
