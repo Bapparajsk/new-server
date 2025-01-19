@@ -3,6 +3,16 @@ import {redisConfig} from "../../config";
 import {sortUser, userAllData} from "../../lib/user";
 import UserModel from "../../models/user.model";
 import {User} from "../../schema/user.schema";
+import {getObjectURL} from "../../lib/awsS3";
+
+const createPictureURL = async (profilePicture: string | null, coverPicture: string| null) => {
+    const [profile, cover] = await Promise.all([
+        profilePicture && getObjectURL(profilePicture),
+        coverPicture && getObjectURL(coverPicture)
+    ]);
+
+    return { profile, cover };
+}
 
 export const get = async (req: Request, res: Response) => {
     try {
@@ -12,7 +22,12 @@ export const get = async (req: Request, res: Response) => {
             return;
         }
 
-        res.status(200).json({ user: sortUser(user) });
+        const userData = sortUser(user);
+        const { profile, cover } = await createPictureURL(user.profilePicture, user.coverPicture);
+        userData.profilePicture = profile;
+        userData.coverPicture = cover;
+
+        res.status(200).json({ user: userData });
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -38,6 +53,9 @@ export const getUserById = async (req: Request, res: Response) => {
         }
 
         const userData = userAllData(user);
+        const { profile, cover } = await createPictureURL(user.profilePicture, user.coverPicture);
+        userData.profilePicture = profile;
+        userData.coverPicture = cover;
         redisConfig.set(`userId:${id}`, JSON.stringify(userData), "EX", 60 * 60 * 24);
 
         res.status(200).json({ user: userData });
