@@ -4,7 +4,14 @@ import express from 'express';
 import morgan from 'morgan';
 import useragent from 'express-useragent';
 import { passport } from "./config";
-import {rateLimiter, corsMiddleware, sessionMiddleware, helmetMiddleware, verifyUser} from "./middleware";
+import {
+    rateLimiter,
+    corsMiddleware,
+    sessionMiddleware,
+    helmetMiddleware,
+    verifyUser,
+    botDetectionMiddleware
+} from "./middleware";
 
 // * router
 import {authRouter,userRouter, friendRouter} from "./router";
@@ -15,6 +22,7 @@ const {helmet, helmetContentSecurityPolicy} = helmetMiddleware;
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(useragent.express());
+// app.use(botDetectionMiddleware);
 app.use(rateLimiter);
 app.use(corsMiddleware);
 app.use(sessionMiddleware);

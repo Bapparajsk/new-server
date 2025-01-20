@@ -45,11 +45,13 @@ export const getUserById = async (req: Request, res: Response) => {
         let user: User | string | null = await redisConfig.get(`userId:${id}`);
         if (typeof user === "string") {
             res.status(200).json({ user: JSON.parse(user) });
+            return;
         }
 
         user = await UserModel.findById(id) as User;
         if (!user) {
             res.status(400).json({ message: "Bad Request" });
+            return;
         }
 
         const userData = userAllData(user);

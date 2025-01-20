@@ -4,6 +4,7 @@ import { googleStrategyVerify, StrategyVerify } from "./passport-oauth";
 import corsMiddleware from './cors';
 import sessionMiddleware from './session';
 import * as helmetMiddleware from './helmet';
+import botDetectionMiddleware from './botDetectionMiddleware';
 
 export {
     verifyUser,
@@ -12,5 +13,6 @@ export {
     StrategyVerify,
     corsMiddleware,
     sessionMiddleware,
-    helmetMiddleware
+    helmetMiddleware,
+    botDetectionMiddleware
 }
