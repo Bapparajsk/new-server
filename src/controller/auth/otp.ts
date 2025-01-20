@@ -50,6 +50,13 @@ export const verifyOtp = async (req: Request, res: Response) => {
             return;
         }
 
+        user.verifyEmail = true;
+        user.notifications.push({
+            name: "Email Verified",
+            description: "Your email has been successfully verified",
+            type: "success", date: new Date()
+        });
+
         // save user
         await user.save();
 

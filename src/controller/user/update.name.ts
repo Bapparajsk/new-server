@@ -1,5 +1,4 @@
 import z from 'zod';
-import {registerZod} from "../../lib/zod";
 import {User} from "../../schema/user.schema";
 
 export const updateName = (user: User, body: any) => {
@@ -7,6 +6,10 @@ export const updateName = (user: User, body: any) => {
         const {name} = body;
         if (!name || name === "" || name.length < 3) {
             return [true, "Name must be at least 3 characters"];
+        }
+
+        if (name === user.name) {
+            return [true, "Name is same as current name"];
         }
 
         user.name = name;

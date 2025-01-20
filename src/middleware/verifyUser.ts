@@ -2,9 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import UserModel from "../models/user.model";
 import { verifyToken } from "../lib/jwt";
 
+
+
 const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.header('x-auth-token');
     // * const token = req.cookies.authToken;  // this for production
+
+    const method = req.method;
 
     if (!token) {
         res.status(401).json({ message: "Unauthorized" });
@@ -22,6 +26,13 @@ const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
         if (!user) {
             res.status(401).json({ message: "Unauthorized" });
             return;
+        }
+
+        if (method !== "GET") {
+            if (user.verifyEmail === false) {
+                res.status(403).json({ message: "Email is not verified. Please verify your email to access this resource." });
+                return;
+            }
         }
 
         if (!user.loginDevices.has(id.deviceId)) {

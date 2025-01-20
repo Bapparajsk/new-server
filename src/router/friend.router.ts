@@ -19,9 +19,9 @@ friendRouter.get('/friend-requests', getFriendRequests);
 friendRouter.get('/suggestions', getSuggestionsFriend);
 
 // * send friend request
-friendRouter.post('/send-request', sendFriendRequest);
-friendRouter.post('/accept-request', acceptFriendRequest);
-friendRouter.post('/reject-request', rejectFriendRequest);
-friendRouter.delete('/remove-friend', removeFriend);
+friendRouter.post('/send-request/:friendId', sendFriendRequest);
+friendRouter.post('/accept-request/:friendId', acceptFriendRequest);
+friendRouter.post('/reject-request/:friendId', rejectFriendRequest);
+friendRouter.delete('/remove-friend/:friendId', removeFriend);
 
 export default friendRouter;

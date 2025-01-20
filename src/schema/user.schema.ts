@@ -19,6 +19,7 @@ export interface User extends Document {
     // Security
     loginDevices: Map<string, LoginDevice>;
     towFactorAuth: boolean;
+    verifyEmail: boolean;
     // Chat
     chatSystem: {
         chatRooms: Map<string, ChatRoom>;
@@ -64,7 +65,7 @@ export interface Notification {
     description?: string | undefined;
     link?: string;
     linkName?: string;
-    type?: "name" | "message" |
+    type?: "name" | "message" | "success" |
         "post" | "comment" | "like" | "share" |
         "friend-accept" | "friend-request"  | "friend-reject" |
         "notification" | "password"| "email"| "primaryDevice" |

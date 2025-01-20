@@ -58,6 +58,7 @@ const UserSchema = new Schema<schemas.User>({
     notifications: {type: [NotificationSchema], default: []},
     loginDevices: {type: Map, of: LoginDeviceSchema, default: new Map()},
     towFactorAuth: {type: Boolean, default: false},
+    verifyEmail: {type: Boolean, default: false},
     chatSystem: {
         chatRooms: {type: Map, of: ChatRoomSchema, default: new Map()},
         chatRoomHead: {type: String, default: null}
@@ -93,11 +94,20 @@ UserSchema.methods.generateOTP = function (): string {
 
 // * Hash password before saving
 UserSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
+
     try {
-        const salt = await bcrypt.genSalt(10);
-        if (this.password === null) return next();
-        this.password = await bcrypt.hash(this.password, salt);
+        if (this.isModified("password")) {
+            const salt = await bcrypt.genSalt(10);
+            if (this.password === null) return next();
+            this.password = await bcrypt.hash(this.password, salt);
+        }
+
+        if (this.isModified("name")) {
+            const name = this.name.trim();
+            if (name[0] !== '@') {
+                this.name = `@${name}`;
+            }
+        }
     } catch (err) {
         console.error('password hash error:- ', err);
     } finally {

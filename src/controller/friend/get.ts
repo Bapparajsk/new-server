@@ -42,8 +42,9 @@ export const getFriendsList = async (req: Request, res: Response) => {
         const page = parseInt(req.query.page as string, 10) || 1;
         const key = `friends:${user._id}:${page}`;
         let friends = await fetchCachedData(key);
-
+        console.log(friends + " friends");
         if (!friends) {
+            console.log("friends not found");
             friends = handlePagination(Array.from(user.friends.values()), page);
             friends = await updateProfilePictures(friends);
             await cacheResponse(key, friends);
