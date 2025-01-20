@@ -49,8 +49,7 @@ This server handles authentication-related operations such as login, registratio
   - Description: Logs out all devices.
   - Response: `{ "message": "All devices logged out successfully" }`
 
-- **helmet**
-  - Description: Middleware to set various HTTP headers for security.### Device Management
+### Device Management
 
 - **PATCH** `/api/auth/register-primary-device/:deviceId`
   - Description: Registers a primary device.
@@ -82,7 +81,11 @@ This server handles authentication-related operations such as login, registratio
 
 - **verifyUser**
   - Description: Middleware to verify the user before processing the request.
-  - - **helmet**
+
+- **botDetectionMiddleware**
+  - Description: Middleware to check if the request is from a bot and deny access if it is.
+
+- **helmet**
   - Description: Middleware to set various HTTP headers for security.
   - Configuration: Configured with Content Security Policy, Referrer Policy, Frameguard, XSS Filter, NoSniff, and IENoOpen.
 
@@ -90,15 +93,15 @@ This server handles authentication-related operations such as login, registratio
 
 - **passport**
   - Description: Passport configuration for Google and GitHub authentication.
-- **authenticateAndRedirect**
-  - Description: Middleware to authenticate and redirect users after successful authentication.
 
 ## Error Handling
 
 - **401 Unauthorized**
   - Description: Returned when the user is not authenticated.
+
 - **400 Bad Request**
   - Description: Returned when the request is malformed or missing required parameters.
+
 - **500 Internal Server Error**
   - Description: Returned when an unexpected error occurs on the server.
 
