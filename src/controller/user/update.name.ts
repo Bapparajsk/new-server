@@ -1,7 +1,7 @@
 import z from 'zod';
 import {User} from "../../schema/user.schema";
 
-export const updateName = (user: User, body: any) => {
+export const updateName = (user: User, body: any, env: "name" | "title") => {
     try {
         const {name} = body;
         if (!name || name === "" || name.length < 3) {
@@ -12,14 +12,14 @@ export const updateName = (user: User, body: any) => {
             return [true, "Name is same as current name"];
         }
 
-        user.name = name;
+        user[env] = name;
         user.notifications.push({
-            name: "Name updated",
-            description: "Name updated successfully",
-            type: "name",
+            name:  `${env} updated`,
+            description: `${env} updated successfully`,
+            type: env,
             date: new Date()
         });
-        return [false, "Name updated successfully"];
+        return [false, "Updated successfully"];
     } catch (e) {
         console.error(e);
         if (e instanceof z.ZodError) {

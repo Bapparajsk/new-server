@@ -65,7 +65,7 @@ export interface Notification {
     description?: string | undefined;
     link?: string;
     linkName?: string;
-    type?: "name" | "message" | "success" |
+    type?: "name" | "title" | "message" | "success" |
         "post" | "comment" | "like" | "share" |
         "friend-accept" | "friend-request"  | "friend-reject" |
         "notification" | "password"| "email"| "primaryDevice" |

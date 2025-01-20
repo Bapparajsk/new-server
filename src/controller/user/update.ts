@@ -10,7 +10,8 @@ const updateConfig = async (env: string, user: User , body: any) => {
     try {
         switch (env) {
             case "name":
-                return updateName(user, body);
+            case "title":
+                return updateName(user, body, env);
             case "password":
                 return updatePassword(user, body);
             case "profilePicture":
@@ -30,7 +31,7 @@ const update = async (req: Request, res: Response) => {
         const env = req.params.env;
         const body = req.body;
 
-        if (!["name", "password", "profilePicture", "coverPicture"].includes(env)) {
+        if (!["name", "title", "password", "profilePicture", "coverPicture"].includes(env)) {
             res.status(404).json({message: "Invalid environment"});
             return;
         }
