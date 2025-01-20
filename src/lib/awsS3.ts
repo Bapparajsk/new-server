@@ -58,6 +58,14 @@ export const verifyImageUpload = async (key: string): Promise<boolean> => {
     }
 }
 
+export const generateKeyToUrl = async (items: Array<any>, fn: (data: Array<any>) => Promise<any[]> ) => {
+    const results = await Promise.allSettled(await fn(items));
+
+    return results.map(result =>
+        result.status === "fulfilled" ? result.value : null
+    );
+}
+
 // export const uploadImageToAWS_S3 = async (url: string, name: string) => {
 //
 //     const response = await axios.get(url, { responseType: 'arraybuffer' });  // get image from url

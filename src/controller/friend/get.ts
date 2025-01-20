@@ -1,29 +1,22 @@
 import { Request, Response } from 'express';
-import { redisConfig } from "../../config";
 import { Friend } from "../../schema/user.schema";
-import { getObjectURL } from "../../lib/awsS3";
+import { getObjectURL, generateKeyToUrl } from "../../lib/awsS3";
 import UserModel from "../../models/user.model";
+import {cacheResponse, fetchCachedData} from "../../lib/cach";
 
-const LIMIT = Number(process.env.LIMIT || "10");
+const LIMIT = Number(process.env.PAGE_LIMIT || "10");
+const TIME = 60; // 1 minute
 
-const cacheResponse = async (key: string, data: any, expiry = 60) => {
-    await redisConfig.set(key, JSON.stringify(data), 'EX', expiry);
-};
-
-const fetchCachedData = async (key: string) => {
-    const cachedData = await redisConfig.get(key);
-    return cachedData ? JSON.parse(cachedData) : null;
-};
-
-const updateProfilePictures = async (items: Friend[]) => {
-    return Promise.all(
-        items.map(async (item) => {
+const updateProfilePictures = async (friends: Friend[]) => {
+    return await generateKeyToUrl(friends, async (data) => (
+        data.map(async (item) => {
             if (item.profilePicture) {
                 item.profilePicture = await getObjectURL(item.profilePicture);
             }
+
             return item;
         })
-    );
+    ));
 };
 
 const handlePagination = (items: Friend[], page: number) => {
@@ -42,12 +35,12 @@ export const getFriendsList = async (req: Request, res: Response) => {
         const page = parseInt(req.query.page as string, 10) || 1;
         const key = `friends:${user._id}:${page}`;
         let friends = await fetchCachedData(key);
-        console.log(friends + " friends");
+
         if (!friends) {
             console.log("friends not found");
             friends = handlePagination(Array.from(user.friends.values()), page);
             friends = await updateProfilePictures(friends);
-            await cacheResponse(key, friends);
+            await cacheResponse(key, friends, TIME);
         }
 
         res.status(200).json({ friends });
@@ -72,7 +65,7 @@ export const getFriendRequests = async (req: Request, res: Response) => {
         if (!friendRequests) {
             friendRequests = handlePagination(Array.from(user.friendRequests.values()), page);
             friendRequests = await updateProfilePictures(friendRequests);
-            await cacheResponse(key, friendRequests);
+            await cacheResponse(key, friendRequests, TIME);
         }
 
         res.status(200).json({ friendRequests });
@@ -109,7 +102,7 @@ export const getSuggestionsFriend = async (req: Request, res: Response) => {
                 .lean();
 
             suggestions = await updateProfilePictures(suggestions);
-            await cacheResponse(key, suggestions);
+            await cacheResponse(key, suggestions, TIME);
         }
 
         res.status(200).json({ suggestions });
