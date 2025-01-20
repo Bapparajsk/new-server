@@ -8,6 +8,7 @@ const botDetectionMiddleware = (req: Request, res: Response, next: NextFunction)
     const botKeywords = ['bot', 'crawl', 'spider', 'slurp', 'google', 'yahoo', 'bing'];
 
     const userAgent = req.useragent?.source.toLowerCase();
+    console.log({userAgent});
 
     // Check if the user-agent contains bot-like keywords
     const isBot = botKeywords.some(keyword => userAgent?.includes(keyword));

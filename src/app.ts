@@ -22,7 +22,7 @@ const {helmet, helmetContentSecurityPolicy} = helmetMiddleware;
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(useragent.express());
-// app.use(botDetectionMiddleware);
+app.use(botDetectionMiddleware);
 app.use(rateLimiter);
 app.use(corsMiddleware);
 app.use(sessionMiddleware);
