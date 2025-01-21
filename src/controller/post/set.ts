@@ -45,8 +45,12 @@ export const verifyPostImage = async (req: Request, res: Response) => {
     }
 
     try {
+        if (typeof accessToken !== "string") {
+            res.status(400).json({message: "Invalid access token provided"});
+            return;
+        }
 
-        if (user.accessTokenExpires === null || user.accessTokenExpires < new Date()) {
+        if (user.accessTokenExpires && user.accessTokenExpires < new Date()) {
             res.status(400).json({ message: "Access Token Expired" });
             return;
         }

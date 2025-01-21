@@ -63,14 +63,29 @@ const imageUpload = async (req: Request, res: Response) => {
         return;
     }
 
+    const user = req.User;
+    if (!user) {
+        res.status(401).json({message: "Unauthorized"});
+        return;
+    }
+
     try {
-        const { key, env } = verifyToken(accessToken) as { key: string, env: string };
-        const user = req.User;
-        if (!user) {
-            res.status(401).json({message: "Unauthorized"});
+        if (typeof accessToken !== "string") {
+            res.status(400).json({message: "Invalid access token provided"});
             return;
         }
 
+        if (user.accessTokenExpires && user.accessTokenExpires < new Date()) {
+            res.status(400).json({message: "Access token expired"});
+            return;
+        }
+
+        if (accessToken !== user.accessToken) {
+            res.status(400).json({message: "Invalid access token provided"});
+            return;
+        }
+
+        const { key, env } = verifyToken(accessToken) as { key: string, env: string };
         if (!key || !env) {
             res.status(400).json({message: "Invalid access token provided"});
             return;
@@ -87,7 +102,10 @@ const imageUpload = async (req: Request, res: Response) => {
         } else {
             user.coverPicture = key;
         }
+
         user.notifications.push({ name: env, description: "Your profile picture has been updated", date: new Date() });
+        user.accessToken = null;
+        user.accessTokenExpires = null;
 
         await user.save();
         res.status(200).json({message: "Profile picture updated successfully"});

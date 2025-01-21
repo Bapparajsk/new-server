@@ -21,10 +21,10 @@ const isPrimaryDevice = (list: Map<string, LoginDevice>, deviceId: string): bool
     return false;
 }
 
-const setTask = (user: User, deviceId: string, task: "setPrimaryDevice" | "removePrimaryDevice") => {
+const setTask = (user: User, deviceId: string, task: "setPrimaryDevice" | "removePrimaryDevice"): [boolean, string, null | string] => {
     try {
         if(!user.loginDevices.has(deviceId)) {
-            return [true, "Device Not Found"];
+            return [true, "Device Not Found", null];
         }
 
         const otp = user.generateOTP();
@@ -34,7 +34,7 @@ const setTask = (user: User, deviceId: string, task: "setPrimaryDevice" | "remov
         return [false, "OTP Sent", accessToken];
     } catch (e) {
         console.error(e);
-        return [true, "Internal Server Error"];
+        return [true, "Internal Server Error", null];
     }
 }
 
@@ -67,6 +67,9 @@ const setPrimaryDevice = async (req: Request, res: Response) => {
             res.status(500).json({ message });
             return;
         }
+
+        user.accessToken = accessToken;
+        user.accessTokenExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
         await user.save();
         res.status(200).json({message: "OTP Sent", accessToken});

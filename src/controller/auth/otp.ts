@@ -149,16 +149,31 @@ export const primaryDeviceVerifyOtp = async (req: Request, res: Response) => {
         return;
     }
 
+    const user = req.User;
+    if (!user) {
+        res.status(404).json({ message: "Unauthorized" });
+        return;
+    }
+
     try {
+        if (typeof otp !== "string" || otp.length !== 6) {
+            res.status(400).json({ message: "Invalid otp" });
+            return;
+        }
+
+        if (typeof accessToken !== "string") {
+            res.status(400).json({ message: "Invalid token" });
+            return;
+        }
+
+        if (user.accessTokenExpires && user.accessTokenExpires < new Date()) {
+            res.status(400).json({ message: "Token expired" });
+            return;
+        }
+
         const { task, deviceId } = verifyToken(accessToken) as {task: string, deviceId : string};
         if (!["setPrimaryDevice", "removePrimaryDevice"].includes(task) || !deviceId) {
             res.status(400).json({ message: "Invalid token" });
-        }
-
-        const user = req.User;
-        if (!user) {
-            res.status(404).json({ message: "Unauthorized" });
-            return;
         }
 
         const device = user.loginDevices.get(deviceId);
@@ -175,6 +190,8 @@ export const primaryDeviceVerifyOtp = async (req: Request, res: Response) => {
 
         // set primary device or remove primary device
         device.isPrimary = task === "setPrimaryDevice";
+        user.accessToken = null;
+        user.accessTokenExpires = null;
         await user.save();
 
         res.status(200).json({ message: "OTP verified" });

@@ -14,6 +14,10 @@ export const pictureUpdate = async (user: User, body: any, env: "profilePicture"
         const url = await putObjectURL(key, 'image/png');
 
         const accessToken = generateToken({ key, env }, "10m");
+
+        user.accessToken = accessToken;
+        user.accessTokenExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
         return [false, { url, accessToken }];
     } catch (e) {
         console.error(e);
