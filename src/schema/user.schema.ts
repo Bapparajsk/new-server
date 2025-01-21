@@ -20,6 +20,8 @@ export interface User extends Document {
     loginDevices: Map<string, LoginDevice>;
     towFactorAuth: boolean;
     verifyEmail: boolean;
+    accessToken: string | null;
+    accessTokenExpires: Date | null;
     // Chat
     chatSystem: {
         chatRooms: Map<string, ChatRoom>;

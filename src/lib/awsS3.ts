@@ -14,10 +14,10 @@ export const getObjectURL = async (key: string, expiresIn = 24 * 60 * 60): Promi
     return await getSignedUrl(AWS_S3, command, { expiresIn });  // 1 day after expire this url
 }
 
-export const putObjectURL = async (fileName: string, contentType: string): Promise<string> => {
+export const putObjectURL = async (key: string, contentType: string): Promise<string> => {
     const command = new PutObjectCommand({
         Bucket: process.env.AWS_BUCKET!,
-        Key: fileName,
+        Key: key,
         ContentType: contentType
     });
 

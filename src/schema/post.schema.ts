@@ -11,8 +11,6 @@ export interface Post extends Document {
 
 export interface Comment {
     userId: string;
-    userName: string;
-    userImage: string | null;
     comment: string;
     createdAt: Date;
 }

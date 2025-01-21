@@ -3,8 +3,6 @@ import * as schema from "../schema/post.schema";
 
 const CommentSchema = new Schema<schema.Comment>({
     userId: { type: String, ref: "User", required: true },
-    userName: { type: String, required: true },
-    userImage: { type: String, default: null },
     comment: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
 });

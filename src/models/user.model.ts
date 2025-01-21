@@ -59,6 +59,7 @@ const UserSchema = new Schema<schemas.User>({
     loginDevices: {type: Map, of: LoginDeviceSchema, default: new Map()},
     towFactorAuth: {type: Boolean, default: false},
     verifyEmail: {type: Boolean, default: false},
+    accessToken: {type: String, default: null},
     chatSystem: {
         chatRooms: {type: Map, of: ChatRoomSchema, default: new Map()},
         chatRoomHead: {type: String, default: null}
