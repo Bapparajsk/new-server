@@ -100,6 +100,7 @@ export const loginWithOtp = async (req: Request, res: Response) => {
     }
 
     try {
+
         const verifiedUser = verifyToken(tempToken) as {email : string};
         if (!verifiedUser || verifiedUser.email === undefined) {
             res.status(400).json({ message: "Invalid token" });
@@ -109,6 +110,21 @@ export const loginWithOtp = async (req: Request, res: Response) => {
         const user = await UserModel.findOne({ email: verifiedUser.email });
         if (!user) {
             res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        if (typeof tempToken !== "string") {
+            res.status(400).json({ message: "Invalid token" });
+            return;
+        }
+
+        if (user.accessTokenExpires && user.accessTokenExpires < new Date()) {
+            res.status(400).json({ message: "Token expired" });
+            return;
+        }
+
+        if (user.accessToken !== tempToken) {
+            res.status(400).json({ message: "Invalid token" });
             return;
         }
 
@@ -132,10 +148,19 @@ export const loginWithOtp = async (req: Request, res: Response) => {
         // create token
         const token = user.generateToken({devicesId}, "2d");
 
+        user.accessToken = null;
+        user.accessTokenExpires = null;
         // save user
         await user.save();
 
-        res.status(200).json({ token, user: sortUser(user) })
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 60 * 24 * 2,
+        });
+
+        res.status(200).json({ user: sortUser(user) })
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "interval server error" });

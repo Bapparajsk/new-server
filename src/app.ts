@@ -2,11 +2,12 @@ import 'dotenv/config';
 import './config/db.config';
 import express from 'express';
 import morgan from 'morgan';
+import cors from 'cors';
 import useragent from 'express-useragent';
 import { passport } from "./config";
 import {
     rateLimiter,
-    corsMiddleware,
+    // corsMiddleware,
     sessionMiddleware,
     helmetMiddleware,
     verifyUser,
@@ -24,7 +25,11 @@ app.use(express.json());
 app.use(useragent.express());
 app.use(botDetectionMiddleware);
 app.use(rateLimiter);
-app.use(corsMiddleware);
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || 'http://127.0.0.1:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());

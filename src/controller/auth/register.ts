@@ -46,10 +46,16 @@ const register = async (req: Request, res: Response) => {
         // Send OTP email asynchronously
         sendOtpEmail(email, otp).catch(console.error);
 
+        // how to cockie set
+        req.cookies.set("token", token, {
+            httpOnly: true,
+            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
+        });
+
         // Respond with success
         res.status(201).json({
             message: "User created",
-            token,
             user: sortUser(user),
         });
     } catch (error) {

@@ -12,7 +12,8 @@ const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = loginZod.parse(req.body);
         const user = await UserModel.findOne({ email });
-
+        console.log({email, password, user});
+        
         // check if user exists
         if (!user) {
             res.status(404).json({ message: "User not found" });
@@ -31,6 +32,8 @@ const login = async (req: Request, res: Response) => {
             // create temporary token and send OTP
             const tempToken = generateToken({ email: user.email }, '5m');
             const otp = user.generateOTP();
+            user.accessToken = tempToken;
+            user.accessTokenExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
             await user.save();
 
             // Send OTP email asynchronously
@@ -64,7 +67,7 @@ const login = async (req: Request, res: Response) => {
             maxAge: 1000 * 60 * 60 * 24 * 2,
         });
 
-        res.status(200).json({ token, user: sortUser(user) });
+        res.status(200).json({ user: sortUser(user) });
     } catch (error) {
         console.error(error);
         if (error instanceof z.ZodError) {
