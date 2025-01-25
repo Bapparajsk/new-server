@@ -5,6 +5,7 @@ import { verifyToken } from "../../lib/jwt"
 import UserModel from "../../models/user.model";
 import {LoginDevice, User} from "../../schema/user.schema";
 import {sortUser} from "../../lib/user";
+import {setCookie} from "../../lib/setCookie";
 
 const otpMach = (user: User, otp: string | undefined): [boolean, string] => {
     if (!otp) {
@@ -152,13 +153,7 @@ export const loginWithOtp = async (req: Request, res: Response) => {
         user.accessTokenExpires = null;
         // save user
         await user.save();
-
-        res.cookie('authToken', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 1000 * 60 * 60 * 24 * 2,
-        });
+        setCookie(res, token);
 
         res.status(200).json({ user: sortUser(user) })
     } catch (e) {

@@ -5,17 +5,19 @@ import { verifyToken } from "../lib/jwt";
 
 
 const verifyUser = async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.header('x-auth-token');
-    // * const token = req.cookies.authToken;  // this for production
-
-    const method = req.method;
-
-    if (!token) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-    }
-
+    //const token = req.header('x-auth-token');
     try {
+        console.log(req.cookies)
+        const token = req.cookies.authToken;  // this for production
+
+        const method = req.method;
+
+        if (!token) {
+            res.status(401).json({ message: "Unauthorized" });
+            return;
+        }
+
+
         const id = verifyToken(token) as { _id: string, deviceId: string };
         if (!id) {
             res.status(401).json({ message: "Unauthorized" });

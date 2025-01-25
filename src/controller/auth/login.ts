@@ -7,12 +7,14 @@ import { generateToken } from "../../lib/jwt";
 import sendOtpEmail from "../../lib/email";
 import {v4 as uuidv4} from "uuid";
 import {LoginDevice} from "../../schema/user.schema";
+import {setCookie} from "../../lib/setCookie";
 
 const login = async (req: Request, res: Response) => {
     try {
+        console.log(req.body);
         const { email, password } = loginZod.parse(req.body);
         const user = await UserModel.findOne({ email });
-        console.log({email, password, user});
+        // console.log({email, password, user});
         
         // check if user exists
         if (!user) {
@@ -60,12 +62,7 @@ const login = async (req: Request, res: Response) => {
 
         // create token and set client cookie
         const token = user.generateToken({deviceId}, '2d');
-        res.cookie('authToken', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 1000 * 60 * 60 * 24 * 2,
-        });
+        setCookie(res, token);
 
         res.status(200).json({ user: sortUser(user) });
     } catch (error) {

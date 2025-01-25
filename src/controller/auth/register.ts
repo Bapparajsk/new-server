@@ -6,6 +6,7 @@ import UserModel from "../../models/user.model";
 import sendOtpEmail from "../../lib/email";
 import { sortUser } from "../../lib/user";
 import { LoginDevice } from "../../schema/user.schema";
+import {setCookie} from "../../lib/setCookie";
 
 const register = async (req: Request, res: Response) => {
     try {
@@ -45,13 +46,7 @@ const register = async (req: Request, res: Response) => {
 
         // Send OTP email asynchronously
         sendOtpEmail(email, otp).catch(console.error);
-
-        // how to cockie set
-        req.cookies.set("token", token, {
-            httpOnly: true,
-            sameSite: "strict",
-            secure: process.env.NODE_ENV === "production",
-        });
+        setCookie(res, token);
 
         // Respond with success
         res.status(201).json({

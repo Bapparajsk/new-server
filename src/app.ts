@@ -3,11 +3,11 @@ import './config/db.config';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import cookieParser from "cookie-parser";
 import useragent from 'express-useragent';
 import { passport } from "./config";
 import {
     rateLimiter,
-    // corsMiddleware,
     sessionMiddleware,
     helmetMiddleware,
     verifyUser,
@@ -22,12 +22,13 @@ const {helmet, helmetContentSecurityPolicy} = helmetMiddleware;
 
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(cookieParser());
 app.use(useragent.express());
 app.use(botDetectionMiddleware);
 app.use(rateLimiter);
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://127.0.0.1:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: ['http://127.0.0.1:3000'],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true
 }));
 app.use(sessionMiddleware);
