@@ -36,7 +36,9 @@ export const get = async (req: Request, res: Response) => {
             await cacheResponse(key, posts, TIME);
         }
 
-        res.status(200).json({ posts });
+        const nextPage = posts.length === LIMIT ? page + 1 : null;
+
+        res.status(200).json({ posts, nextPage });
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });

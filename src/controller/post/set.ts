@@ -3,7 +3,7 @@ import { generateToken, verifyToken } from "../../lib/jwt";
 import {putObjectURL, verifyImageUpload} from "../../lib/awsS3";
 import PostModel from "../../models/post.model";
 
-export const newPost = async (req: Request, res: Response) => {
+export const createUrl = async (req: Request, res: Response) => {
     const { fileName } = req.body;
     if (!fileName) {
         res.status(400).json({ message: "Invalid Request" });

@@ -15,7 +15,7 @@ import {
 } from "./middleware";
 
 // * router
-import {authRouter,userRouter, friendRouter} from "./router";
+import {authRouter,userRouter, friendRouter, postRouter} from "./router";
 
 const app = express();
 const {helmet, helmetContentSecurityPolicy} = helmetMiddleware;
@@ -45,8 +45,9 @@ app.use(helmet.ieNoOpen());
 app.use('/api/auth', authRouter);                   // * user auth routes and passport routes
 app.use('/api/user', verifyUser , userRouter);      // * user routes for user profile and user settings
 app.use('/api/friend', verifyUser , friendRouter);  // * friend routes for friend list and friend request
-
+app.use('/api/post', verifyUser , postRouter);  // * friend routes for friend list and friend request
 // ! test route
+
 app.get("/", verifyUser , (req, res) => {
     res.json({ user: req.User || "it is work" });
 })
