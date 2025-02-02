@@ -59,3 +59,32 @@ export const getUser = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+export const getComments = async (req: Request, res: Response) => {
+    try {
+        const postId = req.params.postId;
+        const post = await PostModel.findById(postId)
+            .populate("comments.userId", "name title profilePicture")
+            .lean()
+            .select(["comments"]);
+
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+        const comments = await generateKeyToUrl(post.comments, async (items) => (
+            items.map(async (item) => {
+                if (item.userId.profilePicture) {
+                    item.userId.profilePicture = await getObjectURL(item.userId.profilePicture, TIME);
+                }
+                return item;
+            })
+        ));
+
+        res.status(200).json({ comments });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}

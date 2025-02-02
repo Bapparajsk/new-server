@@ -1,5 +1,5 @@
-import { get, getUser } from "./get";
-import { createUrl, likePost, commentPost, verifyPostImage } from "./set";
+import { get, getUser, getComments } from "./get";
+import { createUrl, likePost, commentPost, verifyPostImage,  } from "./set";
 
 export {
     get,
@@ -7,5 +7,6 @@ export {
     createUrl,
     likePost,
     commentPost,
-    verifyPostImage
+    verifyPostImage,
+    getComments,
 }
