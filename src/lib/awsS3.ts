@@ -5,13 +5,14 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const AWS_BUCKET = process.env.AWS_BUCKET || "your bucket name";
 
-export const getObjectURL = async (key: string, expiresIn = 24 * 60 * 60): Promise<string> => {
+export const getObjectURL = async (key: string, expiresIn = 60 * 60): Promise<string> => {
     const command = new GetObjectCommand({
         Bucket: process.env.AWS_BUCKET,
         Key: key,
+	ResponseCacheControl: 'max-age=86400, public',  // cache for 1 day
     });
 
-    return await getSignedUrl(AWS_S3, command, { expiresIn });  // 1 day after expire this url
+    return await getSignedUrl(AWS_S3, command, { expiresIn });  // 1 minutes after expire this url
 }
 
 export const putObjectURL = async (key: string, contentType: string): Promise<string> => {
@@ -23,7 +24,6 @@ export const putObjectURL = async (key: string, contentType: string): Promise<st
 
     return await getSignedUrl(AWS_S3, command, { expiresIn: 10 * 60 });  // 10 minutes after expire this url
 }
-
 
 export const deleteObject = async (key: string) : Promise<void> => {
     const command = new DeleteObjectCommand({

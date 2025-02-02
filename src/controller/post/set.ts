@@ -68,7 +68,8 @@ export const verifyPostImage = async (req: Request, res: Response) => {
             return;
         }
 
-        const newPost = new PostModel({ user: user._id, image: key, description });
+        const newPost = new PostModel({ author: user._id as string, postImage: key, description });
+
         user.posts.push(key);
         user.notifications.push({ name: "post", description, date: new Date() });
 

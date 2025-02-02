@@ -26,7 +26,7 @@ export const get = async (req: Request, res: Response) => {
         const { profile, cover } = await createPictureURL(user.profilePicture, user.coverPicture);
         userData.profilePicture = profile;
         userData.coverPicture = cover;
-
+	console.log(userData);
         res.status(200).json({ user: userData });
     } catch (e) {
         console.error(e);
@@ -58,7 +58,7 @@ export const getUserById = async (req: Request, res: Response) => {
         const { profile, cover } = await createPictureURL(user.profilePicture, user.coverPicture);
         userData.profilePicture = profile;
         userData.coverPicture = cover;
-        redisConfig.set(`userId:${id}`, JSON.stringify(userData), "EX", 60 * 60 * 24);
+        redisConfig.set(`userId:${id}`, JSON.stringify(userData), "EX", 60);
 
         res.status(200).json({ user: userData });
     } catch (e) {

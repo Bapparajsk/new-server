@@ -1,10 +1,11 @@
-import { Router } from "express";
-import { get, createUrl, likePost, commentPost, verifyPostImage } from "../controller/post";
+import {Router} from "express";
+import {commentPost, createUrl, get, getUser, likePost, verifyPostImage} from "../controller/post";
 
 const postRouter = Router();
 // * path: /api/posts
 
 postRouter.get("/", get);
+postRouter.get("/:userId", getUser);
 
 postRouter.post("/create-url", createUrl);
 postRouter.post("/verify-post", verifyPostImage);
