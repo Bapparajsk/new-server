@@ -26,7 +26,7 @@ export const get = async (req: Request, res: Response) => {
         const { profile, cover } = await createPictureURL(user.profilePicture, user.coverPicture);
         userData.profilePicture = profile;
         userData.coverPicture = cover;
-	console.log(userData);
+
         res.status(200).json({ user: userData });
     } catch (e) {
         console.error(e);

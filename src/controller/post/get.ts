@@ -15,7 +15,8 @@ const fetchPosts = async (filter: object, page: number, key: string) => {
             .limit(LIMIT)
             .populate("author", "name title, profilePicture")
             .lean()
-            .select(["userId", "description", "postImage", "likes", "createdAt"]);
+            .select(["userId", "description", "postImage", "likes", "createdAt", "comments"])
+            .exec();
        
         posts = await generateKeyToUrl(posts, async (items) => (
             items.map(async (item) => {
@@ -25,6 +26,12 @@ const fetchPosts = async (filter: object, page: number, key: string) => {
                 if (item.author.profilePicture) {
                     item.author.profilePicture = await getObjectURL(item.author.profilePicture, TIME);
                 }
+
+                if (item.comments) {
+                    item.commentsCount = item.comments.length;
+                    delete item.comments;
+                }
+
                 return item;
             })
         ));
