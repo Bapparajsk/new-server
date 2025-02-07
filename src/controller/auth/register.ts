@@ -5,7 +5,7 @@ import { registerZod } from "../../lib/zod";
 import UserModel from "../../models/user.model";
 import sendOtpEmail from "../../lib/email";
 import { sortUser } from "../../lib/user";
-import { LoginDevice } from "../../schema/user.schema";
+import { LoginDevice, Notification } from "../../schema/user.schema";
 import {setCookie} from "../../lib/setCookie";
 
 const register = async (req: Request, res: Response) => {
@@ -33,6 +33,19 @@ const register = async (req: Request, res: Response) => {
         const loginDevices = new Map<string, LoginDevice>();
         loginDevices.set(deviceId, deviceDetails);
 
+        // Prepare notification
+        const notification: Notification = {
+            name: "App",
+            title: "Welcome to the app",
+            description: "You have successfully registered",
+            imageSrc: {
+                env: "local",
+                url: "/notification/register.png",
+                alt: "App logo",
+            },
+            type: "register",
+        };
+
         // Create and save user
         const user = new UserModel({
             name,
@@ -42,6 +55,7 @@ const register = async (req: Request, res: Response) => {
         });
         const otp = user.generateOTP();
         const token = user.generateToken({deviceId}, "2d");
+        user.notifications.push(notification);
         await user.save();
 
         // Send OTP email asynchronously

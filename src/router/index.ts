@@ -1,11 +1,13 @@
-import authRouter from "./auth.router";
-import userRouter from "./user.router";
-import friendRouter from "./friend.router";
-import postRouter from "./post.router";
+import authRoute from "./auth.route";
+import userRoute from "./user.route";
+import friendRoute from "./friend.route";
+import postRoute from "./post.route";
+import notificationRoute from "./notification.route";
 
 export {
-    authRouter,
-    userRouter,
-    friendRouter,
-    postRouter
+    authRoute,
+    userRoute,
+    friendRoute,
+    postRoute,
+    notificationRoute,
 }

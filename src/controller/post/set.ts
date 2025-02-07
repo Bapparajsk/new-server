@@ -1,7 +1,9 @@
 import { Request, Response} from "express";
 import { generateToken, verifyToken } from "../../lib/jwt";
-import {putObjectURL, verifyImageUpload} from "../../lib/awsS3";
+import { putObjectURL, verifyImageUpload } from "../../lib/awsS3";
+import { Notification } from "../../schema/user.schema";
 import PostModel from "../../models/post.model";
+import UserModel from "../../models/user.model";
 
 export const createUrl = async (req: Request, res: Response) => {
     const { fileName } = req.body;
@@ -71,7 +73,7 @@ export const verifyPostImage = async (req: Request, res: Response) => {
         const newPost = new PostModel({ author: user._id as string, postImage: key, description });
 
         user.posts.push(key);
-        user.notifications.push({ name: "post", description, date: new Date() });
+        user.notifications.push({ name: "post", description, type: "post", date: new Date() });
 
         user.accessToken = null;
         user.accessTokenExpires = null;
@@ -112,7 +114,20 @@ export const likePost = async (req: Request, res: Response) => {
             post.likes += 1;
         }
 
-        await Promise.all([user.save(), post.save()]);
+        const notification: Notification = {
+            name: user.likedPosts.has(postId) ? "like" : "unlike",
+            description:  "Your post has been " + user.likedPosts.has(postId) ? "like" : "unlike",
+            linkName: user.name,
+            link: '/profile/uid=' + user._id,
+            type:  user.likedPosts.has(postId) ? "like" : "unlike",
+            date: new Date()
+        }
+
+        await Promise.all([
+            user.save(),
+            post.save(),
+            UserModel.findOneAndUpdate({ _id: post.author }, { $push: { notifications: notification } })
+        ]);
         res.status(200).json({ message: "Post Liked Successfully" });
     } catch (e) {
         console.error(e);

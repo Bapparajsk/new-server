@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import UserModel from "../../models/user.model";
-import { User } from "../../schema/user.schema";
+import { User, Notification } from "../../schema/user.schema";
+import {ConnectFriendByType, SetNotificationType} from "../../type/controller/friend/set";
+import {userNotificationProducer} from "../../lib/bullmqProducer";
 
 // Helper Functions
-const connectFriendBy = (user: User, friend: User, env: "friends" | "friendRequests" | "friendRequestsSent") => {
+const connectFriendBy = ({user, friend, env} : ConnectFriendByType) => {
     user[env].set(friend._id as string, {
         userId: friend._id as string,
         name: friend.name,
@@ -13,7 +15,7 @@ const connectFriendBy = (user: User, friend: User, env: "friends" | "friendReque
     });
 };
 
-const setNotification = (user: User, friend: User, type: "friend-accept" | "friend-request" | "friend-reject") => {
+const createNotification = ({user, friend, type}: SetNotificationType): Notification => {
     const titles = {
         "friend-request": "Friend Request",
         "friend-accept": "Friend Accept",
@@ -25,16 +27,17 @@ const setNotification = (user: User, friend: User, type: "friend-accept" | "frie
         "friend-reject": `${friend.name} rejected your friend request`,
     };
 
-    user.notifications.push({
+    return {
         name: friend.name,
         title: titles[type],
-        imageSrc: friend.profilePicture,
+        imageSrc: {
+            env: "cloudinary",
+            url: friend.profilePicture,
+            alt: friend.name,
+        },
         description: descriptions[type],
-        link: `/profile/${friend._id}`,
-        linkName: "View Profile",
-        type,
-        date: new Date(),
-    });
+        type
+    }
 };
 
 const verify = async (user: User | undefined, friendId: string, res: Response): Promise<[User, User, string] | false> => {
@@ -69,17 +72,20 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
             return;
         }
 
-        connectFriendBy(user, friend, "friends");
-        connectFriendBy(friend, user, "friends");
+        connectFriendBy({user, friend, env: "friends"});
+        connectFriendBy({friend, user, env: "friends"});
         user.friendRequests.delete(friendId);
         friend.friendRequestsSent.delete(user._id as string);
-        setNotification(friend, user, "friend-accept");
-
-        // TODO - send notification to friend from socket and push notification -> firebase
 
         await Promise.all([user.save(), friend.save()]);
-
         res.status(201).json({ message: "Friend request accepted" });
+
+        userNotificationProducer({
+            id: friend._id as string,
+            notification: createNotification({user, friend, type: "friend-accept"}),
+            pushNotificationToken: friend.pushNotificationToken
+        }).catch(console.error);
+
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -107,23 +113,31 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
             return;
         }
 
+        let env: "friends" | "friendRequestsSent" = "friends";
+        let type: "friend-accept" | "friend-request" = "friend-accept";
+
         if (user.friendRequests.has(friendId)) {
-            connectFriendBy(user, friend, "friends");
-            connectFriendBy(friend, user, "friends");
+            connectFriendBy({ user, friend, env });
+            connectFriendBy({ friend, user, env });
             user.friendRequests.delete(friendId);
             friend.friendRequestsSent.delete(user._id as string);
-            setNotification(friend, user, "friend-accept");
-            // TODO - send notification to friend from socket and push notification -> firebase
         } else {
-            // TODO - send notification to friend from socket and push notification -> firebase
-            connectFriendBy(user, friend, "friendRequestsSent");
-            connectFriendBy(friend, user, "friendRequests");
-            setNotification(friend, user, "friend-request");
+            env = "friendRequestsSent";
+            type = "friend-request";
+            connectFriendBy({ user, friend, env });
+            connectFriendBy({ friend, user, env });
         }
 
+        // * save and send response
         await Promise.all([user.save(), friend.save()]);
-
         res.status(201).json({ message: "Friend request sent" });
+
+        userNotificationProducer({
+            id: friend._id as string,
+            notification: createNotification({user, friend, type}),
+            pushNotificationToken: friend.pushNotificationToken
+        }).catch(console.error);
+
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -143,13 +157,16 @@ export const rejectFriendRequest = async (req: Request, res: Response) => {
 
         user.friendRequests.delete(friendId);
         friend.friendRequestsSent.delete(user._id as string);
-        setNotification(friend, user, "friend-reject");
-
-        // TODO - send notification to friend from socket and push notification -> firebase
 
         await Promise.all([user.save(), friend.save()]);
-
         res.status(201).json({ message: "Friend request rejected" });
+
+        userNotificationProducer({
+            id: friend._id as string,
+            notification: createNotification({user, friend, type: "friend-reject"}),
+            pushNotificationToken: friend.pushNotificationToken
+        }).catch(console.error);
+
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -170,10 +187,7 @@ export const removeFriend = async (req: Request, res: Response) => {
         user.friends.delete(friendId);
         friend.friends.delete(user._id as string);
 
-        // TODO - send notification to friend from socket and push notification -> firebase
-
         await Promise.all([user.save(), friend.save()]);
-
         res.status(200).json({ message: "Friend removed" });
     } catch (e) {
         console.error(e);

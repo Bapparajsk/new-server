@@ -6,15 +6,13 @@ import {sortUser} from "../../lib/user";
 import { generateToken } from "../../lib/jwt";
 import sendOtpEmail from "../../lib/email";
 import {v4 as uuidv4} from "uuid";
-import {LoginDevice} from "../../schema/user.schema";
+import {LoginDevice, Notification} from "../../schema/user.schema";
 import {setCookie} from "../../lib/setCookie";
 
 const login = async (req: Request, res: Response) => {
     try {
-        console.log(req.body);
         const { email, password } = loginZod.parse(req.body);
         const user = await UserModel.findOne({ email });
-        // console.log({email, password, user});
         
         // check if user exists
         if (!user) {
@@ -57,6 +55,20 @@ const login = async (req: Request, res: Response) => {
         };
         user.loginDevices.set(deviceId, deviceDetails);
 
+        const notification : Notification = {
+            name: "Login",
+            title: "New Login",
+            description: "New login from " + deviceDetails.deviceName,
+            imageSrc: {
+                env: "local",
+                url: "/notification/login.png",
+                alt: user.name,
+            },
+            type: "login",
+        }
+
+        // add notification to user
+        user.notifications.push(notification);
         // save user
         await user.save();
 

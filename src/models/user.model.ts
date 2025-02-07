@@ -26,13 +26,19 @@ const FriendSchema = new Schema<schemas.Friend>({
 });
 
 const NotificationSchema = new Schema<schemas.Notification>({
-    name: {type: String, default: null},
-    title: {type: String, default: null},
-    imageSrc: {type: String, default: null},
+    name: {type: String, required: true},
+    title: {type: String, required: true},
+    imageSrc: {
+        env: {type: String, default: null},
+        url: {type: String, default: null},
+        alt: {type: String, default: null}
+    },
     description: {type: String, default: null},
     link: {type: String, default: null},
     linkName: {type: String, default: null},
-    type: {type: String, default: null}
+    type: {type: String, required: true},
+    isRead: {type: Boolean, default: false},
+    date: {type: Date, default: Date.now}
 });
 
 const LoginDeviceSchema = new Schema<schemas.LoginDevice>({
@@ -56,6 +62,7 @@ const UserSchema = new Schema<schemas.User>({
     friendRequests: {type: Map, of: FriendSchema, default: new Map()},
     friendRequestsSent: {type: Map, of: FriendSchema, default: new Map()},
     notifications: {type: [NotificationSchema], default: []},
+    pushNotificationToken: {type: String, default: null},
     loginDevices: {type: Map, of: LoginDeviceSchema, default: new Map()},
     towFactorAuth: {type: Boolean, default: false},
     verifyEmail: {type: Boolean, default: false},

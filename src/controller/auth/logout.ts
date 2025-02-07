@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import {Notification} from "../../schema/user.schema";
+import {userNotificationProducer} from "../../lib/bullmqProducer";
 
 export const logout = async (req: Request, res: Response) => {
     res.clearCookie('authToken', {
@@ -39,6 +41,20 @@ export const logoutDevice = async (req: Request, res: Response) => {
         user.loginDevices.delete(deviceId);
         await user.save();
         res.status(200).json({ message: "Logged out" });
+
+        // Send notification to the user
+        const notification: Notification = {
+            name: "Logout",
+            title: "Logout",
+            description: "Logout from " + devise.deviceName,
+            imageSrc: {
+                env: "local",
+                url: "/notification/logout.png",
+                alt: user.name,
+            },
+            type: "logout",
+        }
+        userNotificationProducer({ id: user._id as string, notification }).catch(console.error);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal server error" });
@@ -80,8 +96,21 @@ export const logoutDevices = async (req: Request, res: Response) => {
 
         // Save the user
         await user.save();
-
         res.status(200).json({ message: "Logged out", results });
+
+        // Send notification to the user
+        const notification: Notification = {
+            name: "Logout",
+            title: "Logout",
+            description: "Logout from all devices",
+            imageSrc: {
+                env: "local",
+                url: "/notification/logout.png",
+                alt: user.name,
+            },
+            type: "logout",
+        }
+        userNotificationProducer({ id: user._id as string, notification }).catch(console.error);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal server error" });

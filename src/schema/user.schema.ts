@@ -16,6 +16,7 @@ export interface User extends Document {
     friendRequests: Map<string, Friend>;
     friendRequestsSent: Map<string, Friend>;
     notifications: Notification[];
+    pushNotificationToken: string | null;
     // Security
     loginDevices: Map<string, LoginDevice>;
     towFactorAuth: boolean;
@@ -61,18 +62,23 @@ export interface Friend {
 }
 
 export interface Notification {
-    name?: string;
-    title?: string;
-    imageSrc?: string | null;
+    name: string;
+    title: string;
+    imageSrc?: {
+        env: "local" | "cloudinary";
+        url: string | null;
+        alt: string;
+    };
     description?: string | undefined;
     link?: string;
     linkName?: string;
     type?: "name" | "title" | "message" | "success" |
-        "post" | "comment" | "like" | "share" |
+        "post" | "comment" | "like" | "unlike" | "share" |
         "friend-accept" | "friend-request"  | "friend-reject" |
-        "notification" | "password"| "email"| "primaryDevice" |
-        "login" | undefined;
-    date: Date;
+        "notification.ts" | "password"| "email"| "primaryDevice" |
+        "login" | "register" | "logout" | undefined;
+    date?: Date;
+    isRead?: boolean;
 }
 
 export interface LoginDevice {

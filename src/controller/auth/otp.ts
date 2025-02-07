@@ -3,9 +3,10 @@ import { v4 as uuid4 } from 'uuid';
 import sendOtpEmail from "../../lib/email";
 import { verifyToken } from "../../lib/jwt"
 import UserModel from "../../models/user.model";
-import {LoginDevice, User} from "../../schema/user.schema";
+import {LoginDevice, Notification, User} from "../../schema/user.schema";
 import {sortUser} from "../../lib/user";
 import {setCookie} from "../../lib/setCookie";
+import {userNotificationProducer} from "../../lib/bullmqProducer";
 
 const otpMach = (user: User, otp: string | undefined): [boolean, string] => {
     if (!otp) {
@@ -53,9 +54,15 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
         user.verifyEmail = true;
         user.notifications.push({
-            name: "Email Verified",
-            description: "Your email has been successfully verified",
-            type: "success", date: new Date()
+            name: "Email",
+            title: "Email Verification",
+            description: "Email verified",
+            imageSrc: {
+                env: "local",
+                url: "/notification/email.png",
+                alt: user.name,
+            },
+            type: "email",
         });
 
         // save user
@@ -215,6 +222,20 @@ export const primaryDeviceVerifyOtp = async (req: Request, res: Response) => {
         await user.save();
 
         res.status(200).json({ message: "OTP verified" });
+
+        const notification: Notification = {
+            name: "Primary Device",
+            title: "Primary Device",
+            description: task === "setPrimaryDevice" ? "Primary device set" : "Primary device removed",
+            imageSrc: {
+                env: "local",
+                url: "/notification/primaryDevice.png",
+                alt: user.name,
+            },
+            type: "primaryDevice",
+        }
+
+        userNotificationProducer({ id: user._id as string, notification }).catch(console.error);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "interval server error" });
