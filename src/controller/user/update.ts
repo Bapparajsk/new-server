@@ -103,7 +103,17 @@ const imageUpload = async (req: Request, res: Response) => {
             user.coverPicture = key;
         }
 
-        user.notifications.push({ name: env, description: "Your profile picture has been updated", date: new Date() });
+        user.notifications.push({
+            name: env,
+            title: "Profile Picture Updated",
+            description: "Your profile picture has been updated", date: new Date(),
+            type: "name",
+            imageSrc: {
+                env: "local",
+                url: key,
+                alt: "Profile Picture"
+            }
+        });
         user.accessToken = null;
         user.accessTokenExpires = null;
 

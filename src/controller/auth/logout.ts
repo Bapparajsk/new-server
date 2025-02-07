@@ -53,6 +53,7 @@ export const logoutDevice = async (req: Request, res: Response) => {
                 alt: user.name,
             },
             type: "logout",
+            date: new Date()
         }
         userNotificationProducer({ id: user._id as string, notification }).catch(console.error);
     } catch (e) {
@@ -109,6 +110,7 @@ export const logoutDevices = async (req: Request, res: Response) => {
                 alt: user.name,
             },
             type: "logout",
+            date: new Date()
         }
         userNotificationProducer({ id: user._id as string, notification }).catch(console.error);
     } catch (e) {

@@ -63,6 +63,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
                 alt: user.name,
             },
             type: "email",
+            date: new Date()
         });
 
         // save user
@@ -233,6 +234,7 @@ export const primaryDeviceVerifyOtp = async (req: Request, res: Response) => {
                 alt: user.name,
             },
             type: "primaryDevice",
+            date: new Date()
         }
 
         userNotificationProducer({ id: user._id as string, notification }).catch(console.error);

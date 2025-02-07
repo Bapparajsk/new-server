@@ -36,7 +36,10 @@ const createNotification = ({user, friend, type}: SetNotificationType): Notifica
             alt: friend.name,
         },
         description: descriptions[type],
-        type
+        type,
+        link: `/profile/uid=${friend._id}`,
+        linkName: friend.name,
+        date: new Date(),
     }
 };
 

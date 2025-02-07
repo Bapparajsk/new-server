@@ -19,7 +19,18 @@ export const updatePassword = (user: User, body: any) => {
 
         const { password } = passwordZod.parse({password: newPassword});
         user.password = password;
-        user.notifications.push({ name: "Password Updated", description: "Your password has been updated successfully", type: "password", date: new Date() });
+        user.notifications.push({
+            name: "Password Updated",
+            title: "Password Updated",
+            description: "Your password has been updated successfully",
+            type: "password",
+            date: new Date(),
+            imageSrc: {
+                env: "local",
+                url: "/notification/security.png",
+                alt: "Password Updated"
+            }
+        });
 
         sendEmail(user.email, "Password Updated", "Your password has been updated successfully").catch(console.error);
         return [false, "Password updated successfully"];

@@ -15,14 +15,4 @@ export function handleConnection(socket: Socket) {
     socket.on('logout', () => {
         db.setOffline(socketId);
     });
-
-    socket.on("sendMessage", ({ to, message }) => {
-        if (db.isOnlineByUserId(to)) {
-            socket.to(to).emit("receiveMessage", { message });
-
-            return;
-        }
-
-        socket.emit("receiveMessage", { message });
-    })
 }

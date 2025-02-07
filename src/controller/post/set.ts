@@ -3,7 +3,7 @@ import { generateToken, verifyToken } from "../../lib/jwt";
 import { putObjectURL, verifyImageUpload } from "../../lib/awsS3";
 import { Notification } from "../../schema/user.schema";
 import PostModel from "../../models/post.model";
-import UserModel from "../../models/user.model";
+import {postNotificationProducer} from "../../lib/bullmqProducer";
 
 export const createUrl = async (req: Request, res: Response) => {
     const { fileName } = req.body;
@@ -73,13 +73,25 @@ export const verifyPostImage = async (req: Request, res: Response) => {
         const newPost = new PostModel({ author: user._id as string, postImage: key, description });
 
         user.posts.push(key);
-        user.notifications.push({ name: "post", description, type: "post", date: new Date() });
-
         user.accessToken = null;
         user.accessTokenExpires = null;
 
         await Promise.all([newPost.save(), user.save()]);
         res.status(200).json({ message: "Post Created Successfully" });
+
+        postNotificationProducer({
+            id: user._id as string,
+            notification: {
+                name: "post",
+                title: `new post by ${user.name}`,
+                description: description,
+                imageSrc: { env: "cloudinary", url: user.profilePicture, alt: user.name, },
+                link: '/post/' + newPost._id,
+                linkName: user.name,
+                type: "post",
+                date: new Date()
+            },
+        }).catch(console.error);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -116,6 +128,7 @@ export const likePost = async (req: Request, res: Response) => {
 
         const notification: Notification = {
             name: user.likedPosts.has(postId) ? "like" : "unlike",
+            title: user.name,
             description:  "Your post has been " + user.likedPosts.has(postId) ? "like" : "unlike",
             linkName: user.name,
             link: '/profile/uid=' + user._id,
@@ -123,12 +136,14 @@ export const likePost = async (req: Request, res: Response) => {
             date: new Date()
         }
 
-        await Promise.all([
-            user.save(),
-            post.save(),
-            UserModel.findOneAndUpdate({ _id: post.author }, { $push: { notifications: notification } })
-        ]);
+        await Promise.all([ user.save(), post.save() ]);
         res.status(200).json({ message: "Post Liked Successfully" });
+
+        postNotificationProducer({
+            id: post.author,
+            notification,
+        }).catch(console.error);
+
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -157,10 +172,22 @@ export const commentPost = async (req: Request, res: Response) => {
         }
 
         post.comments.push({ userId: user._id as string,comment, createdAt: new Date() });
-        user.notifications.push({ name: "comment", description: comment, date: new Date() });
-
         await Promise.all([user.save(), post.save()]);
+
         res.status(200).json({ message: "Post Commented Successfully" });
+
+        postNotificationProducer({
+            id: post.author,
+            notification: {
+                name: "comment",
+                title: user.name,
+                description: comment,
+                linkName: user.name,
+                link: '/profile/uid=' + user._id,
+                type: "comment",
+                date: new Date()
+            },
+        }).catch(console.error);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });

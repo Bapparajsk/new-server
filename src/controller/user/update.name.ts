@@ -15,9 +15,15 @@ export const updateName = (user: User, body: any, env: "name" | "title") => {
         user[env] = name;
         user.notifications.push({
             name:  `${env} updated`,
+            title: `${env} updated`,
             description: `${env} updated successfully`,
             type: env,
-            date: new Date()
+            date: new Date(),
+            imageSrc: {
+                env: "local",
+                url: `/notification/${env}.png`,
+                alt: `${env} updated`
+            }
         });
         return [false, "Updated successfully"];
     } catch (e) {

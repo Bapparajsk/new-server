@@ -65,6 +65,7 @@ const login = async (req: Request, res: Response) => {
                 alt: user.name,
             },
             type: "login",
+            date: new Date(),
         }
 
         // add notification to user

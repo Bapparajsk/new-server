@@ -44,6 +44,7 @@ const register = async (req: Request, res: Response) => {
                 alt: "App logo",
             },
             type: "register",
+            date: new Date(),
         };
 
         // Create and save user

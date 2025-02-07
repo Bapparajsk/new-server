@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node ./dist/bin/www.js\"",
+    "dev": "tsc-watch --onSuccess \"node ./dist/bin/www.js && node ./dist/lib/bullmqWorker.js\"",
     "build": "tsc",
     "start": "node ./dist/bin/www.js",
     "lint": "eslint 'src/**/*.{ts,js}'"
@@ -36,7 +36,7 @@
     "typescript-eslint": "^8.19.1"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.730.0",
+    "@aws-sdk/client-s3": "^3.743.0",
     "@aws-sdk/s3-request-presigner": "^3.730.0",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",

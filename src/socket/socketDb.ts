@@ -21,3 +21,7 @@ export function isOnlineBySocketId(socketId: string) {
 export function isOnlineByUserId(userId: string) {
     return UserByUserId.has(userId);
 }
+
+export function getSocketIdByUserId(userId: string) {
+    return UserByUserId.get(userId);
+}

@@ -1,4 +1,5 @@
-import { Queue, QueueOptions, WorkerOptions } from 'bullmq';
+import {Queue, QueueOptions, WorkerOptions, Worker, Job} from 'bullmq';
+import {CreateWorkerType} from "../type/config/bullmq.config";
 
 const connection = {
     // port: Number.parseInt(process.env.REDIS_PORT || "6379"), // Redis port
@@ -16,6 +17,20 @@ export const WorkerConfig: WorkerOptions = {
     removeOnComplete: { count: 2 },  //
 }
 
+export const createWorker = ({
+    queueName,
+    workerFn,
+}: CreateWorkerType) => {
+    const worker = new Worker(queueName, async (job) => {
+        await workerFn(job);
+    }, WorkerConfig);
+
+    worker.on("failed", (job, error, prev) => {
+        console.error(`Worker ${queueName} failed`, error);
+    });
+    return worker;
+};
+
 export const userNotificationQueue = new Queue("userNotificationQueue", QueueConfig)
-// export const newPostNotificationQueue = new Queue("newPostNotificationQueue", QueueConfig)
-// export const friendNotificationQueue = new Queue("friendNotificationQueue", QueueConfig)
+export const postNotificationQueue = new Queue("postNotificationQueue", QueueConfig)
+export const pushNotificationFireBaseAndSocket = new Queue("pushNotificationFireBaseAndSocket", QueueConfig)
