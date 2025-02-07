@@ -8,8 +8,9 @@ import io from '../bin/www';
 import {getSocketIdByUserId, isOnlineByUserId} from "../socket/socketDb";
 
 export const userNotificationWorkerFn = async (job: Job) => {
-    const {id , notification, pushNotificationToken} = job.data as UserNotificationType;
+    const { id , notification } = job.data as UserNotificationType;
     await UserModel.findOneAndUpdate({ _id: id }, { $push: { notifications: notification } });
+    await pushNotificationFireBaseAndSocketProducer({ id, notification }).catch(console.error);
 }
 
 export const postNotificationWorkerFn = async (job: Job) => {
@@ -48,8 +49,7 @@ const createPushNotificationMessage = (notification: Notification) => {
 
 export const pushNotificationFireBaseAndSocketFn = async (job: Job) => {
     const { id, notification, pushNotificationToken } = job.data as UserNotificationType;
-    // if user is online send notification via socket
-
+    
     if (isOnlineByUserId(id)) {
         const socketId = getSocketIdByUserId(id);
         if (!socketId) return;

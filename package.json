@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node ./dist/bin/www.js && node ./dist/lib/bullmqWorker.js\"",
+    "dev": "tsc-watch --onSuccess \"node ./dist/bin/www.js \"",
     "build": "tsc",
     "start": "node ./dist/bin/www.js",
     "lint": "eslint 'src/**/*.{ts,js}'"

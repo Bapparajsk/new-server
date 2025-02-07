@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import './config/db.config';
+import "./lib/bullmqWorker";
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -16,6 +17,7 @@ import {
 
 // * router
 import {authRoute,userRoute, friendRoute, postRoute, notificationRoute} from "./router";
+import { pushNotificationFireBaseAndSocketProducer } from './lib/bullmqProducer';
 
 const app = express();
 const {helmet, helmetContentSecurityPolicy} = helmetMiddleware;
@@ -49,8 +51,22 @@ app.use('/api/post', verifyUser , postRoute);  // * friend routes for friend lis
 app.use('/api/notification', verifyUser , notificationRoute);  // * friend routes for friend list and friend request
 
 // ! test route
-app.get("/", verifyUser , (req, res) => {
-    res.json({ user: req.User || "it is work" });
+app.get("/:uid", async (req, res) => {
+    const userId = req.params.uid;
+    console.log(userId);
+    
+    await pushNotificationFireBaseAndSocketProducer({
+        id: userId,
+        notification: {
+            name: "test",
+            title: "test",
+            description: "test",
+            date: new Date(),
+            type: "name"
+        }
+    })
+
+    res.send('okay');
 })
 
 export default app;

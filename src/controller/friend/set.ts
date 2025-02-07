@@ -116,19 +116,17 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
             return;
         }
 
-        let env: "friends" | "friendRequestsSent" = "friends";
         let type: "friend-accept" | "friend-request" = "friend-accept";
 
         if (user.friendRequests.has(friendId)) {
-            connectFriendBy({ user, friend, env });
-            connectFriendBy({ friend, user, env });
+            connectFriendBy({ user, friend, env: "friends" });
+            connectFriendBy({ friend, user, env: "friends"  });
             user.friendRequests.delete(friendId);
             friend.friendRequestsSent.delete(user._id as string);
         } else {
-            env = "friendRequestsSent";
             type = "friend-request";
-            connectFriendBy({ user, friend, env });
-            connectFriendBy({ friend, user, env });
+            connectFriendBy({ user, friend, env: "friendRequestsSent" });
+            connectFriendBy({ friend, user, env: "friendRequests" });
         }
 
         // * save and send response
