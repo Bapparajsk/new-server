@@ -3,6 +3,7 @@ import UserModel from "../../models/user.model";
 import { User, Notification } from "../../schema/user.schema";
 import {ConnectFriendByType, SetNotificationType} from "../../type/controller/friend/set";
 import {userNotificationProducer} from "../../lib/bullmqProducer";
+import {deleteKeysByPattern} from "../../lib/cach";
 
 // Helper Functions
 const connectFriendBy = ({user, friend, env} : ConnectFriendByType) => {
@@ -76,7 +77,7 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
         }
 
         connectFriendBy({user, friend, env: "friends"});
-        connectFriendBy({friend, user, env: "friends"});
+        connectFriendBy({ user: friend, friend: user, env: "friends"});
         user.friendRequests.delete(friendId);
         friend.friendRequestsSent.delete(user._id as string);
 
@@ -89,6 +90,9 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
             pushNotificationToken: friend.pushNotificationToken
         }).catch(console.error);
 
+        deleteKeysByPattern(`friends:${friend._id}:*`).catch(console.error);
+        deleteKeysByPattern(`friends:${user._id}:*`).catch(console.error);
+        deleteKeysByPattern(`friendRequests:${user._id}:*`).catch(console.error);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -120,13 +124,13 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
 
         if (user.friendRequests.has(friendId)) {
             connectFriendBy({ user, friend, env: "friends" });
-            connectFriendBy({ friend, user, env: "friends"  });
+            connectFriendBy({ user: friend, friend: user, env: "friends" });
             user.friendRequests.delete(friendId);
             friend.friendRequestsSent.delete(user._id as string);
         } else {
             type = "friend-request";
             connectFriendBy({ user, friend, env: "friendRequestsSent" });
-            connectFriendBy({ friend, user, env: "friendRequests" });
+            connectFriendBy({ user: friend, friend: user, env: "friendRequests" });
         }
 
         // * save and send response
@@ -139,6 +143,8 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
             pushNotificationToken: friend.pushNotificationToken
         }).catch(console.error);
 
+        deleteKeysByPattern(`friendRequests:${friend._id}:*`).catch(console.error);
+        deleteKeysByPattern(`suggestions:${user._id}:*`).catch(console.error);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -167,7 +173,7 @@ export const rejectFriendRequest = async (req: Request, res: Response) => {
             notification: createNotification({user, friend, type: "friend-reject"}),
             pushNotificationToken: friend.pushNotificationToken
         }).catch(console.error);
-
+        await deleteKeysByPattern(`friendRequests:${user._id}:*`);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });
@@ -190,6 +196,8 @@ export const removeFriend = async (req: Request, res: Response) => {
 
         await Promise.all([user.save(), friend.save()]);
         res.status(200).json({ message: "Friend removed" });
+        await deleteKeysByPattern(`friends:${friend._id}:*`);
+        await deleteKeysByPattern(`friends:${user._id}:*`);
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "Internal Server Error" });

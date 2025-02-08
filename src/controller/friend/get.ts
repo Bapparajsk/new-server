@@ -31,7 +31,6 @@ export const getFriendsList = async (req: Request, res: Response) => {
         let friends = await fetchCachedData(key);
 
         if (!friends) {
-            console.log("friends not found");
             friends = handlePagination(Array.from(user.friends.values()), page, LIMIT);
             friends = await updateProfilePictures(friends);
             await cacheResponse(key, friends, TIME);
@@ -80,7 +79,7 @@ export const getSuggestionsFriend = async (req: Request, res: Response) => {
         const page = parseInt(req.query.page as string, 10) || 1;
         const key = `suggestions:${user._id}:${page}`;
         let suggestions = await fetchCachedData(key);
-	console.log(suggestions, "hey");
+
         if (!suggestions) {
             const excludeIds = [
                 ...Array.from(user.friends.values()).map((f) => f.userId),
