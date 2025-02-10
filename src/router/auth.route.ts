@@ -31,7 +31,7 @@ authRoute.get('/google/callback', authenticateAndRedirect('google'));
 authRoute.get('/github', passport.authenticate('github', { scope: ['user:email', 'id', 'displayName', 'photos'] }));
 authRoute.get('/github/callback', authenticateAndRedirect('github'));
 
-authRoute.post("/register-primary-device/verify-otp", verifyUser, primaryDeviceVerifyOtp);  // Path: /api/auth/register-primary-device/verify-otp
+authRoute.put("/register-primary-device/verify-otp", verifyUser, primaryDeviceVerifyOtp);  // Path: /api/auth/register-primary-device/verify-otp
 authRoute.post("/register-primary-device/:deviceId", verifyUser, setPrimaryDevice);  // Path: /api/auth/register-primary-device/:deviceId
 authRoute.delete("/remove-primary-device/:deviceId", verifyUser, removePrimaryDevice);  // Path: /api/auth/remove-primary-device/:deviceId
 

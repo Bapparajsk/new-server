@@ -10,9 +10,9 @@ postRoute.get("/:userId", getUser);
 postRoute.get("/:postId/comments", getComments);
 
 postRoute.post("/create-url", createUrl);
-postRoute.post("/verify-post", verifyPostImage);
+postRoute.put("/verify-post", verifyPostImage);
 
-postRoute.post("/:postId/like", likePost);
-postRoute.post("/:postId/comment", commentPost);
+postRoute.patch("/:postId/like", likePost);
+postRoute.put("/:postId/comment", commentPost);
 
 export default postRoute;

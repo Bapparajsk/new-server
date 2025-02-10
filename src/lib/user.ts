@@ -16,6 +16,7 @@ export const sortUser = (user: User) => {
         ...commonUserData(user),
         likedPosts: user.likedPosts,
         chatSystem: user.chatSystem.chatRooms,
+        isNewPassword: !user.password,
     }
 }
 

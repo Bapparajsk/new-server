@@ -35,9 +35,12 @@ export const get = async (req: Request, res: Response) => {
             notifications = await updateProfilePictures(notifications);
             await cacheResponse(key, notifications, TIME);
         }
+        
+        const nextPage = notifications.length === LIMIT ? page + 1 : null;
 
-        res.status(200).json({ notifications });
+        res.status(200).json({ notifications, nextPage });
     } catch (e) {
-
+        console.error(e);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };

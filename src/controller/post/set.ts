@@ -83,7 +83,7 @@ export const verifyPostImage = async (req: Request, res: Response) => {
             id: user._id as string,
             notification: {
                 name: "post",
-                title: `new post by ${user.name}`,
+                title: `Upload ${user.name} new Post`,
                 description: description,
                 imageSrc: { env: "cloudinary", url: user.profilePicture, alt: user.name, },
                 link: '/post/' + newPost._id,
@@ -131,7 +131,7 @@ export const likePost = async (req: Request, res: Response) => {
             title: user.name,
             description:  "Your post has been " + user.likedPosts.has(postId) ? "like" : "unlike",
             linkName: user.name,
-            link: '/profile/uid=' + user._id,
+            link: '/profile?uid=' + user._id,
             type:  user.likedPosts.has(postId) ? "like" : "unlike",
             date: new Date()
         }
@@ -183,7 +183,7 @@ export const commentPost = async (req: Request, res: Response) => {
                 title: user.name,
                 description: comment,
                 linkName: user.name,
-                link: '/profile/uid=' + user._id,
+                link: '/profile?uid=' + user._id,
                 type: "comment",
                 date: new Date()
             },

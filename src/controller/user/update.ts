@@ -49,7 +49,7 @@ const update = async (req: Request, res: Response) => {
         }
 
         await user.save();
-        res.status(200).json(message);
+        res.status(200).json({message});
     } catch (e) {
         console.error(e);
         res.status(500).json({message: "Internal server error"});
