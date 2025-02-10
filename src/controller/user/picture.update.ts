@@ -6,7 +6,7 @@ export const pictureUpdate = async (user: User, body: any, env: "profilePicture"
     try {
         const { fileName } = body;
         if (!fileName) {
-            return [true, "Invalid file name"];
+            return [true, "Invalid file name", 400];
         }
 
         // generate key and url for the image to be uploaded to AWS S3
@@ -18,9 +18,9 @@ export const pictureUpdate = async (user: User, body: any, env: "profilePicture"
         user.accessToken = accessToken;
         user.accessTokenExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-        return [false, { url, accessToken }];
+        return [false, { url, accessToken }, 200];
     } catch (e) {
         console.error(e);
-        return [true, "Internal server error"];
+        return [true, "Internal server error", 500];
     }
 }

@@ -13,16 +13,16 @@ const updateConfig = async (env: string, user: User , body: any) => {
             case "title":
                 return updateName(user, body, env);
             case "password":
-                return updatePassword(user, body);
+                return await updatePassword(user, body);
             case "profilePicture":
             case "coverPicture":
                 return pictureUpdate(user, body, env);
         }
 
-        return [true, "Invalid environment"];
+        return [true, "Invalid environment", 404];
     } catch (e) {
         console.error(e);
-        return [true, "Internal server error"];
+        return [true, "Internal server error", 500];
     }
 }
 

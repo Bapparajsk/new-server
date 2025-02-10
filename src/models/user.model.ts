@@ -79,6 +79,10 @@ const UserSchema = new Schema<schemas.User>({
 // * Methods
 // Compare password with hashed password
 UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+    if (this.password === null) {
+        console.log(this.password);
+        return true;
+    }
     return bcrypt.compare(candidatePassword, this.password);
 };
 

@@ -1,20 +1,20 @@
-import z from 'zod';
-import {User} from "../../schema/user.schema";
-import {registerZod} from "../../lib/zod";
-import {sendEmail} from "../../lib/email";
+import { ZodError } from 'zod';
+import { User } from "../../schema/user.schema";
+import { registerZod } from "../../lib/zod";
+import { sendEmail } from "../../lib/email";
 
 const passwordZod = registerZod.pick({password: true});
 
-export const updatePassword = (user: User, body: any) => {
+export const updatePassword = async (user: User, body: any) => {
     try {
         const { oldPassword, newPassword } = body;
-        const isMatch = user.comparePassword(oldPassword);
+        const isMatch = await user.comparePassword(oldPassword);
         if (!isMatch) {
-            return [true, "Invalid password"];
+            return [true, "Invalid password", 400];
         }
 
         if (oldPassword === newPassword) {
-            return [true, "New password cannot be the same as the old password"];
+            return [true, "New password cannot be the same as the old password", 400];
         }
 
         const { password } = passwordZod.parse({password: newPassword});
@@ -36,7 +36,7 @@ export const updatePassword = (user: User, body: any) => {
         return [false, "Password updated successfully"];
     } catch (e) {
         console.error(e);
-        if (e instanceof z.ZodError) return [true, e.errors[0].message];
-        return [true, "Internal server error"];
+        if (e instanceof ZodError) return [true, e.errors[0].message, 400];
+        return [true, "Internal server error", 500];
     }
 }

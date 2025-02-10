@@ -20,6 +20,12 @@ const login = async (req: Request, res: Response) => {
             return;
         }
 
+        // check if user has password set
+        if (user.password === null) {
+            res.status(400).json({ message: "Invalid credentials" });
+            return;
+        }
+
         // compare password
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
