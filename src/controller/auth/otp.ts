@@ -127,7 +127,7 @@ export const loginWithOtp = async (req: Request, res: Response) => {
     }
 
     try {
-
+	
         const verifiedUser = verifyToken(tempToken) as {email : string};
         if (!verifiedUser || verifiedUser.email === undefined) {
             res.status(400).json({ message: "Invalid token" });
@@ -162,18 +162,18 @@ export const loginWithOtp = async (req: Request, res: Response) => {
         }
 
         // loginDevices add new device
-        const devicesId = uuid4();
+        const deviceId = uuid4();
         const deviceDetails: LoginDevice = {
-            deviceId: devicesId,
+            deviceId: deviceId,
             deviceName: req.useragent?.source || "Unknown",
             os: req.useragent?.os || "Unknown",
             lastLogin: new Date(),
             isPrimary: false
         };
-        user.loginDevices.set(devicesId, deviceDetails);
+        user.loginDevices.set(deviceId, deviceDetails);
 
         // create token
-        const token = user.generateToken({devicesId}, "2d");
+        const token = user.generateToken({deviceId}, "2d");
 
         user.accessToken = null;
         user.accessTokenExpires = null;
@@ -286,7 +286,7 @@ export const towFactorAuthOtpVerify = async (req: Request, res: Response) => {
         await user.save();
 
         const message = env === "register2FA" ? "2FA enabled" : "2FA disabled";
-        res.status(200).json({message});
+        res.status(200).json({message, towFactorAuth : env === "register2FA"});
         const notification: Notification = {
             name: "2FA",
             title: env === "register2FA" ? "Register 2FA" : "Unregister 2FA",
