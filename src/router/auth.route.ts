@@ -3,7 +3,8 @@ import {
     login, register,
     verifyOtp, loginWithOtp, sendOtp,
     logout, logoutDevice, logoutDevices,
-    setPrimaryDevice, removePrimaryDevice, primaryDeviceVerifyOtp
+    setPrimaryDevice, removePrimaryDevice, primaryDeviceVerifyOtp,
+    towFactorAuthOtpVerify, towFactorAuth,
 } from "../controller/auth";
 import verifyUser from "../middleware/verifyUser";
 import {passport, authenticateAndRedirect} from '../config';
@@ -18,6 +19,10 @@ authRoute.post('/register', register);  // Path: /api/auth/register
 authRoute.post('/otp/login-with', loginWithOtp);  // Path: /api/auth/otp
 authRoute.post('/otp/verify', verifyUser, verifyOtp);  // Path: /api/auth/otp/verify
 authRoute.post('/otp/send', verifyUser, sendOtp);  // Path: /api/auth/otp/send
+
+// * path: /api/auth/2fa
+authRoute.post('/2fa', verifyUser, towFactorAuth);  // Path: /api/auth/2fa
+authRoute.post('/2fa/verify', verifyUser, towFactorAuthOtpVerify);  // Path: /api/auth/2fa/verify
 
 // * Path: /api/auth/logout
 authRoute.delete("/logout", verifyUser, logout);  // Path: /api/auth/logout

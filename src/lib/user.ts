@@ -17,6 +17,7 @@ export const sortUser = (user: User) => {
         likedPosts: user.likedPosts,
         chatSystem: user.chatSystem.chatRooms,
         isNewPassword: !user.password,
+        towFactorAuth: user.towFactorAuth,
     }
 }
 

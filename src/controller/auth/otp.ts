@@ -284,7 +284,7 @@ export const towFactorAuthOtpVerify = async (req: Request, res: Response) => {
         user.accessToken = null;
         user.accessTokenExpires = null;
         await user.save();
-
+        res.status(200).json({message: "OTP verified"});
         const notification: Notification = {
             name: "2FA",
             title: env === "register2FA" ? "Register 2FA" : "Unregister 2FA",
