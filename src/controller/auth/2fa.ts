@@ -33,7 +33,7 @@ export const towFactorAuth = async (req: Request, res: Response) => {
         user.accessTokenExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
         await user.save();
 
-        res.status(200).json({ message: "OTP Sent", accessToken });
+        res.status(200).json({ message: "OTP Sent in your Email", accessToken });
         sendOtpEmail(user.email, otp).catch(console.error);
     } catch (e) {
         console.log(e);
