@@ -76,7 +76,7 @@ export interface Notification {
         "post" | "comment" | "like" | "unlike" | "share" |
         "friend-accept" | "friend-request"  | "friend-reject" |
         "notification.ts" | "password"| "email"| "primaryDevice" |
-        "login" | "register" | "logout" | undefined;
+        "login" | "register" | "logout" | "2FA" | undefined;
     date?: Date;
     isRead?: boolean;
 }

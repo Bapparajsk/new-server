@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
-import { v4 as uuid4 } from 'uuid';
+import {Request, Response} from 'express';
+import {v4 as uuid4} from 'uuid';
 import sendOtpEmail from "../../lib/email";
-import { verifyToken } from "../../lib/jwt"
+import {verifyToken} from "../../lib/jwt"
 import UserModel from "../../models/user.model";
 import {LoginDevice, Notification, User} from "../../schema/user.schema";
 import {sortUser} from "../../lib/user";
@@ -34,12 +34,31 @@ const otpMach = (user: User, otp: string | undefined): [boolean, string] => {
     return [true, "OTP verified"];
 }
 
+const verifyOtpAndAccessToken = (user: User, accessToken: string, otp: string): [boolean, string] => {
+    if (user.accessTokenExpires && user.accessTokenExpires < new Date()) {
+        return [true, "Token expired"];
+    }
+
+    if (user.accessToken !== accessToken) {
+        return [true, "Invalid token"];
+    }
+
+    if (otp.length !== 6) {
+        return [true, "Invalid OTP"];
+    }
+
+    if (user.otp !== otp) {
+        return [true, "Invalid OTP"];
+    }
+
+    return [false, "OTP verified"];
+}
+
 export const verifyOtp = async (req: Request, res: Response) => {
     const { otp } = req.body;
 
     try {
         const user = req.User;
-
         // Check if user is authenticated
         if(!user) {
             res.status(401).json({ message: "Unauthorized" });
@@ -68,7 +87,6 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
         // save user
         await user.save();
-
         res.status(200).json({ message: "OTP verified" });
     } catch (e) {
         console.error(e);
@@ -184,18 +202,9 @@ export const primaryDeviceVerifyOtp = async (req: Request, res: Response) => {
     }
 
     try {
-        if (typeof otp !== "string" || otp.length !== 6) {
-            res.status(400).json({ message: "Invalid otp" });
-            return;
-        }
-
-        if (typeof accessToken !== "string") {
-            res.status(400).json({ message: "Invalid token" });
-            return;
-        }
-
-        if (user.accessTokenExpires && user.accessTokenExpires < new Date()) {
-            res.status(400).json({ message: "Token expired" });
+        const [isError, errorMessage] = verifyOtpAndAccessToken(user, accessToken, otp);
+        if (isError) {
+            res.status(400).json({ message: errorMessage });
             return;
         }
 
@@ -241,5 +250,57 @@ export const primaryDeviceVerifyOtp = async (req: Request, res: Response) => {
     } catch (e) {
         console.error(e);
         res.status(500).json({ message: "interval server error" });
+    }
+}
+
+export const towFactorAuthOtpVerify = async (req: Request, res: Response) => {
+    try {
+        const {accessToken, otp} = req.body;
+        if (!accessToken || !otp) {
+            res.status(400).json({message: "Temporary token and otp is required"});
+            return;
+        }
+
+        const user = req.User;
+        if (!user) {
+            res.status(401).json({message: "Unauthorized"});
+            return;
+        }
+
+        const [isError, errorMessage] = verifyOtpAndAccessToken(user, accessToken, otp);
+        if (isError) {
+            res.status(400).json({message: errorMessage});
+            return;
+        }
+
+        const { env } = verifyToken(accessToken) as {env: string};
+
+        if (env !== "register2FA" && env !== "unregister2FA") {
+            res.status(400).json({message: "Invalid token"});
+            return;
+        }
+
+        user.towFactorAuth = env === "register2FA";
+        user.accessToken = null;
+        user.accessTokenExpires = null;
+        await user.save();
+
+        const notification: Notification = {
+            name: "2FA",
+            title: env === "register2FA" ? "Register 2FA" : "Unregister 2FA",
+            description: env === "register2FA" ? "2FA enabled" : "2FA disabled",
+            imageSrc: {
+                env: "local",
+                url: "/notification/2FA.png",
+                alt: user.name,
+            },
+            type: "2FA",
+            date: new Date()
+        }
+
+        userNotificationProducer({ id: user._id as string, notification }).catch(console.error);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({message: "interval server error"});
     }
 }

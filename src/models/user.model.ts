@@ -106,7 +106,6 @@ UserSchema.methods.generateOTP = function (): string {
 
 // * Hash password before saving
 UserSchema.pre("save", async function (next) {
-
     try {
         if (this.isModified("password")) {
             const salt = await bcrypt.genSalt(10);
