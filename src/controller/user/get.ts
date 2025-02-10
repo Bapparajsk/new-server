@@ -66,3 +66,18 @@ export const getUserById = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
+export const getLoginDevices = async (req: Request, res: Response) => {
+    try {
+        const user = req.User;
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        res.status(200).json({ devices: user.loginDevices });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
