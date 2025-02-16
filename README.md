@@ -104,7 +104,3 @@ This server handles authentication-related operations such as login, registratio
 
 - **500 Internal Server Error**
   - Description: Returned when an unexpected error occurs on the server.
-
-## License
-
-This project is licensed under the MIT License.
