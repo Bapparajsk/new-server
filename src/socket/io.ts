@@ -9,8 +9,6 @@ export function handleConnection(socket: Socket) {
     });
 
     socket.on('login', (userId: string) => {
-        console.log('login', {userId, socketId});
-        
         db.setOnline(socketId, userId);
     });
 
